@@ -53,8 +53,8 @@ All tests were performed using MSI GS5 laptop with i7-8750H, 16GB of ram and SAT
 
 All programs were compiled gcc 7.3, with -O3 flag.
 
-Each program was run 10 times for each model and numbers reported below are average timings in milliseconds.
-First number is the read time and second number is the write time. Best numbers for model - in bold.
+Each program was run 10 times for each model. Numbers reported below are average timings in milliseconds.
+First number is the read time and second number is the write time. Best numbers for a given model are in bold.
 
   |           |            armadillo |      armadillo_ascii |         armadillo_le |                bunny |             bunny_le |                 cube |               dragon |            dragon_le |         happy_buddha |      happy_buddha_le |                 lucy |              lucy_le |              suzanne |           suzanne_le |        xyzrgb_dragon |     xyzrgb_dragon_le |     xyzrgb_statuette |  xyzrgb_statuette_le |
   |----------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|---------------------:|

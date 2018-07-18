@@ -1,0 +1,15 @@
+**/.DS_Store
+.DS_Store
+bin
+bin/**
+results
+results/**
+*.sh
+.vscode
+.vscode/**
+benchmark/__pycache__
+benchmark/__pycache__/**
+benchmark/table.md
+test.ply
+**.ply
+**.txt

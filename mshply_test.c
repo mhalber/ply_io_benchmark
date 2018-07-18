@@ -14,7 +14,7 @@ clang -I<path_to_msh> -Imshply/ -O3 -std=c11 mshply_test.c -o bin/mshply_test
 #define MSH_PLY_IMPLEMENTATION
 #include "msh/msh_std.h"
 #include "msh/msh_argparse.h"
-#include "msh/experimental/msh_ply.h"
+#include "msh/msh_ply.h"
 
 typedef struct options
 {

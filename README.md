@@ -2,12 +2,12 @@
 
 This repository contains a simple benchmark comparing various libraries for input/output of ply files.
 
-For this benchmark we use models from the [Stanford 3D Scaning Repository](http://graphics.stanfgunziord.edu/data/3Dscanrep/).
+For this benchmark we use models from the [Stanford 3D Scaning Repository](http://graphics.stanford.edu/data/3Dscanrep/).
 In addition to models provided in repository, we have added cube and subdivided suzanne models as a baseline. We have also added little endian variation of each model as well as ascii variation of armadillo. Variations were created
 by exporting meshes using Meshlab.
 
 The reading task is simply opening any of the input file and extracting the minimal __triangle__ mesh
-information from it, that is vertex position buffer, face indices buffer, as well as counts of
+information from it, that is vertex position buffer, fgace indices buffer, as well as counts of
 each element.
 
 The writing task is to write out the read file back as a little endian binary file.

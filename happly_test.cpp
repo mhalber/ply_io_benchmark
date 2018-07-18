@@ -1,32 +1,25 @@
 /*
 Author: Maciej Halber
 Data: 04/09/18
-Description: Benchmarking the read and write capabilities of tinyply by @ddiakopoulos
-Setting is simple - getting positions and vertex_indices from a ply file that describes
-triangular mesh.
-
+Description: 
 License: Public Domain
 Compilation:
-clang++ -I<path_to_msh> -Itinyply/ -O3 -std=c++11 tinyply/tinyply.cpp tinyply2_test.cpp -o bin/tinyply2_test
+clang++ -I<path_to_msh> -Ihapply/ -O3 -std=c++11 happly_test.cpp -o bin/happly_test
+
 Notes:
-- No way to do non-triangle meshes?
 */
-
-#define MSH_STD_IMPLEMENTATION
-#define MSH_ARGPARSE_IMPLEMENTATION
-#include "msh/msh_std.h"
-#include "msh/msh_argparse.h"
-
 #include <thread>
 #include <vector>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <cstring>
-#include <unordered_map>
-#include "tinyply.h"
+#include "happly.h"
 
-
+#define MSH_STD_IMPLEMENTATION
+#define MSH_ARGPARSE_IMPLEMENTATION
+#include "msh/msh_std.h"
+#include "msh/msh_argparse.h"
 
 typedef struct options
 {
@@ -56,40 +49,64 @@ typedef struct triangle_mesh
 void
 read_ply( const char* filename, TriMesh* mesh)
 {
-  using namespace tinyply;
-  std::ifstream ss(filename, std::ios::binary);
-  PlyFile file;
-  file.parse_header(ss);
-  
-  std::shared_ptr<PlyData> verts, faces;
-  verts = file.request_properties_from_element("vertex", {"x", "y", "z"});
-  faces = file.request_properties_from_element("face", { "vertex_indices" });
+  happly::PLYData plyIn(filename);
 
-  file.read(ss);
+  std::vector<float> xPos   = plyIn.getElement("vertex").getProperty<float>("x");
+  std::vector<float> yPos   = plyIn.getElement("vertex").getProperty<float>("y");
+  std::vector<float> zPos   = plyIn.getElement("vertex").getProperty<float>("z");
+  std::vector<std::vector<int>> face_ind = plyIn.getElement("face").getListProperty<int>("vertex_indices");
+
+  mesh->n_verts  = (int)xPos.size();
+  mesh->n_faces  = (int)face_ind.size();
+  mesh->vertices = (Vec3f*)malloc( mesh->n_verts * sizeof(Vec3f));
+  mesh->faces    = (Tri*)malloc( mesh->n_faces * sizeof(Tri));
+  for( int i = 0; i < mesh->n_verts; ++i )
   {
-    mesh->n_verts  = verts->count;
-    mesh->n_faces  = faces->count;
-    mesh->vertices = (Vec3f*)malloc( verts->buffer.size_bytes() );
-    mesh->faces    = (Tri*)malloc( faces->buffer.size_bytes() );
-    std::memcpy(mesh->vertices, verts->buffer.get(), verts->buffer.size_bytes() );
-    std::memcpy(mesh->faces, faces->buffer.get(), faces->buffer.size_bytes() );
+    mesh->vertices[i] = (Vec3f){ xPos[i], yPos[i], zPos[i] };
+  }
+  for( int i = 0; i < mesh->n_faces; ++i )
+  {
+    mesh->faces[i] = (Tri){ face_ind[i][0], face_ind[i][1], face_ind[i][2] };
   }
 }
 
 void
 write_ply( const char* filename, const TriMesh* mesh )
 {
-  using namespace tinyply;
-  std::filebuf fb;
-  fb.open(filename, std::ios::out | std::ios::binary);
-  std::ostream outstream(&fb);
-  PlyFile cube_file;
-  cube_file.add_properties_to_element("vertex", { "x", "y", "z" }, 
-      Type::FLOAT32, mesh->n_verts, reinterpret_cast<uint8_t*>(mesh->vertices), Type::INVALID, 0);
-  cube_file.add_properties_to_element("face", { "vertex_indices" },
-        Type::UINT32, mesh->n_faces, reinterpret_cast<uint8_t*>((int*)&mesh->faces[0].i1), Type::UINT8, 3);
-  cube_file.write(outstream, true);
-  fb.close();
+  // Create an empty object
+  happly::PLYData plyOut;
+
+  plyOut.addElement("vertex", mesh->n_verts);
+  plyOut.addElement("face", mesh->n_faces);
+
+  std::vector<float> xPos(mesh->n_verts);
+  std::vector<float> yPos(mesh->n_verts);
+  std::vector<float> zPos(mesh->n_verts);
+  for( int i = 0; i < mesh->n_verts; i++) 
+  {
+    xPos[i] = mesh->vertices[i].x;
+    yPos[i] = mesh->vertices[i].y;
+    zPos[i] = mesh->vertices[i].z;
+  }
+
+  plyOut.getElement("vertex").addProperty<float>("x", xPos);
+  plyOut.getElement("vertex").addProperty<float>("y", yPos);
+  plyOut.getElement("vertex").addProperty<float>("z", zPos);
+
+  std::vector<std::vector<int>> intInds;
+  for( int i = 0; i < mesh->n_faces; ++i )
+  {
+    std::vector<int> thisInds(3);
+    thisInds[0] = mesh->faces[i].i1;
+    thisInds[1] = mesh->faces[i].i2;
+    thisInds[2] = mesh->faces[i].i3;
+    intInds.push_back(thisInds);
+  }
+
+  // Store
+  plyOut.getElement("face").addListProperty<int>("vertex_indices", intInds);
+
+  plyOut.write(filename, happly::DataFormat::Binary);
 }
 
 int parse_arguments( int argc, char**argv, Opts* opts)
@@ -99,7 +116,7 @@ int parse_arguments( int argc, char**argv, Opts* opts)
   opts->output_filename = NULL;
   opts->verbose         = 0;
 
-  msh_ap_init( &parser, "bourkeply test",
+  msh_ap_init( &parser, "nanoply test",
                "This program simply reads and optionally writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
@@ -137,7 +154,7 @@ main( int argc, char** argv )
   float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;

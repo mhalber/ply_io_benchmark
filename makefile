@@ -2,7 +2,9 @@ CC=gcc
 CPP=g++
 CFLAGS=-O3 -std=c11
 CPPFLAGS=-O3 -std=c++11
-MSH_DIR=../
+
+MSH_DIR=../dev/
+
 all:
 	$(CC) -I$(MSH_DIR) -Iturkply/ $(CFLAGS) turkply/ply_io.c turkply_test.c -o bin/turkply_test
 	$(CC) -I$(MSH_DIR) -Irply/ $(CFLAGS) rply/rply.c rply_test.c -o bin/rply_test

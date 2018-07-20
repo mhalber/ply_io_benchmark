@@ -44,16 +44,16 @@ typedef struct triangle_mesh
 
 const char* positions_names[] = { "x", "y", "z" };
 const char* vertex_indices_names[] = { "vertex_indices" };
-msh_ply_property_desc_t vertex_desc = { .element_name = "vertex",
-                                        .property_names = positions_names,
-                                        .num_properties = 3,
-                                        .data_type = MSH_PLY_FLOAT};
-msh_ply_property_desc_t face_desc = { .element_name = "face",
-                                      .property_names = vertex_indices_names,
-                                      .num_properties = 1,
-                                      .data_type = MSH_PLY_INT32,
-                                      .list_type = MSH_PLY_UINT8,
-                                      .list_size_hint = 3 };
+msh_ply_desc_t vertex_desc = { .element_name = "vertex",
+                               .property_names = positions_names,
+                               .num_properties = 3,
+                               .data_type = MSH_PLY_FLOAT};
+msh_ply_desc_t face_desc = { .element_name = "face",
+                             .property_names = vertex_indices_names,
+                             .num_properties = 1,
+                             .data_type = MSH_PLY_INT32,
+                             .list_type = MSH_PLY_UINT8,
+                             .list_size_hint = 3 };
 
 
 void

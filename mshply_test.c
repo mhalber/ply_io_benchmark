@@ -55,10 +55,13 @@ msh_ply_desc_t face_desc = { .element_name = "face",
                              .list_type = MSH_PLY_UINT8,
                              .list_size_hint = 3 };
 
-
 void
 read_ply( const char* filename, TriMesh* mesh)
 {
+  vertex_desc.data       = &mesh->vertices;
+  vertex_desc.data_count = &mesh->n_verts;
+  face_desc.data         = &mesh->faces;
+  face_desc.data_count   = &mesh->n_faces;
   msh_ply_t* pf = msh_ply_open( filename, "rb");
   if( pf )
   {
@@ -72,6 +75,10 @@ read_ply( const char* filename, TriMesh* mesh)
 void
 write_ply( const char* filename, TriMesh* mesh )
 {
+  vertex_desc.data       = &mesh->vertices;
+  vertex_desc.data_count = &mesh->n_verts;
+  face_desc.data         = &mesh->faces;
+  face_desc.data_count   = &mesh->n_faces;
   msh_ply_t* pf = msh_ply_open( filename, "wb");
   if( pf )
   {
@@ -117,25 +124,20 @@ main( int argc, char** argv )
   if( parse_err ) { return 1; }
 
   // Update the descriptors to point to mesh data
-  vertex_desc.data       = &mesh.vertices;
-  vertex_desc.data_count = &mesh.n_verts;
-  face_desc.data         = &mesh.faces;
-  face_desc.data_count   = &mesh.n_faces;
-
   msh_cprintf( opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
   read_ply( opts.input_filename, &mesh );
   t2 = msh_time_now();
-  float read_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
+  double read_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
 
   t1 = msh_time_now();
   write_ply( opts.output_filename, &mesh );
   t2 = msh_time_now();
-  float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
+  double write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
 
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d\n", mesh.n_verts, mesh.n_faces );
 
   int test_idx = 1024;

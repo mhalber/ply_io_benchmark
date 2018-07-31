@@ -76,10 +76,11 @@ read_ply_file( const char* filename, TriMesh* mesh)
   FILE *fp = fopen(filename, "rb");
   if (!fp) { return; }
   PlyFile *in_ply = read_ply (fp );
-
+  
   for( i = 0; i < in_ply->num_elem_types; i++) 
   {
     elem_name = setup_element_read_ply(in_ply, i, &elem_count);
+    
     if( !strcmp("vertex", elem_name) ) 
     {
       mesh->vertices = (Vec3f*)malloc( sizeof(Vec3f) * elem_count);
@@ -94,7 +95,8 @@ read_ply_file( const char* filename, TriMesh* mesh)
       }
     }
 
-    else if (!strcmp("face", elem_name)) {
+    if (!strcmp("face", elem_name)) 
+    {
       mesh->n_faces = elem_count; 
       mesh->faces   = (Face*)malloc( sizeof(Face) * elem_count );
 
@@ -129,6 +131,9 @@ write_ply_file( char* filename, const TriMesh* mesh )
   describe_property_ply( ply, &vert_props[1] );
   describe_property_ply( ply, &vert_props[2] );
 
+/*
+  Describe what properties go into the face elements.
+*/
   describe_element_ply( ply, "face", mesh->n_faces );
   describe_property_ply( ply, &face_props[0] );
 
@@ -203,15 +208,15 @@ main( int argc, char** argv )
 
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;
-  msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
-                              test_idx, 
-                              mesh.vertices[test_idx].x,
-                              mesh.vertices[test_idx].y,
-                              mesh.vertices[test_idx].z );
+  // msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
+  //                             test_idx, 
+  //                             mesh.vertices[test_idx].x,
+  //                             mesh.vertices[test_idx].y,
+  //                             mesh.vertices[test_idx].z );
   msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
                               test_idx, 
                               mesh.faces[test_idx].vertex_indices[0],

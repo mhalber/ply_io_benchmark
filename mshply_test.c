@@ -131,13 +131,13 @@ main( int argc, char** argv )
   double read_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
 
   t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh );
+  if( opts.output_filename ) { write_ply( opts.output_filename, &mesh ); }
   t2 = msh_time_now();
   double write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
 
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose && opts.output_filename, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d\n", mesh.n_verts, mesh.n_faces );
 
   int test_idx = 1024;

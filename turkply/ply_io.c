@@ -1603,6 +1603,7 @@ void binary_get_element(PlyFile *plyfile, char *elem_ptr)
       /* get and store the number of items in the list */
       get_binary_item (fp, prop->count_external,
                       &int_val, &uint_val, &double_val);
+      // printf("%d %u %f\n", int_val, uint_val, double_val);
       if (store_it) {
         item = elem_data + prop->count_offset;
         store_item(item, prop->count_internal, int_val, uint_val, double_val);
@@ -2680,9 +2681,13 @@ Entry:
 void get_element_ply (PlyFile *plyfile, void *elem_ptr)
 {
   if (plyfile->file_type == PLY_ASCII)
+  {
     ascii_get_element (plyfile, (char *) elem_ptr);
+  }
   else
+  {
     binary_get_element (plyfile, (char *) elem_ptr);
+  }
 }
 
 

@@ -11,7 +11,7 @@ def run_test( binary_name, model_name, n_tries, results_folder ):
 
     result_file = open(result_filename, "w")
     
-    for i in range(0, n_tries):
+    for _ in range(0, n_tries):
       proc = subprocess.Popen( [binary_name, model_name, "-o", "test.ply"], stdout=subprocess.PIPE )
       output = proc.stdout.read().decode('utf-8').rstrip()
       result_file.write( "%s\n" % output )

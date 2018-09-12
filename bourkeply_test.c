@@ -4,11 +4,11 @@ Data: 04/09/18
 Description: Benchmarking the read and write capabilities of bourkeply, a ply file
 reader found on Paul Bourke's site. It also lists greg turk as an author but features different
 api that turkply.
-Setting is simple - getting positions and vertex_indices from a ply file that describes
-triangular mesh.
 License: Public Domain
+
 Compilation:
-clang -I<path_to_msh> -Ibourkeply/ -O3 -std=c11 bourkeply/plyfile.c bourkeply_test.c -o bin/bourkeply_test
+gcc -I<path_to_msh> -Ibourkeply/ -O3 -std=c11 bourkeply/plyfile.c bourkeply_test.c -o bin/bourkeply_test
+
 Notes:
 - bourke's ply seem to have issues with writing binary files? (Bug on my side? - possible, but ascii output is fine)
 - bourke's ply seems to enforce the internal mesh structures' face layout to follow the one of ply format
@@ -18,11 +18,9 @@ Notes:
   - made my_alloc(...) non-static to follow declaration in ply.h
   - made filename passed to read function take a const char* instead of char*
   - Auxiliary data idea could be utilized to get the tris.
-
-NOTE: The examples are based on Greg Turk code from 94
 */
 
-
+#define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #include "msh/msh_std.h"
@@ -131,7 +129,6 @@ write_ply( char* filename, const TriMesh* mesh )
   ply = ply_open_for_writing(filename, 2, elem_names, PLY_BINARY_LE, &version);
 
   /* describe what properties go into the vertex and face elements */
-
   ply_element_count (ply, "vertex", mesh->n_verts);
   ply_describe_property (ply, "vertex", &vert_props[0]);
   ply_describe_property (ply, "vertex", &vert_props[1]);
@@ -163,11 +160,11 @@ parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = NULL;
+  opts->output_filename = "test.ply";
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "bourkeply test",
-               "This program simply reads and optionally writes an input ply file" );
+               "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
   msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",
@@ -204,8 +201,8 @@ main( int argc, char** argv )
   float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;
   msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",

@@ -6,8 +6,10 @@ reader found on jburkardt's site. It lists greg turk as an author.
 Setting is simple - getting positions and vertex_indices from a ply file that describes
 triangular mesh.
 License: Public Domain
+
 Compilation:
-clang -I<path_to_msh> -Iturkply/ -O3 -std=c11 turkply/ply_io.c turkply_test.c -o bin/turkply_test
+gcc -I<path_to_msh> -Iturkply/ -O2 -std=c11 turkply/ply_io.c turkply_test.c -o bin/turkply_test
+
 Notes:
 - turk's ply annoingly has function called conflicted with my functions.
 - turk's ply does not deal with the endianness correctly
@@ -17,6 +19,7 @@ Notes:
 NOTE: The examples are based on Greg Turk code from 94
 */
 
+#define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #include "msh/msh_std.h"
@@ -119,10 +122,10 @@ write_ply_file( char* filename, const TriMesh* mesh )
   int num_elem_types;
   PlyFile *ply;
   FILE* output = NULL;
-  output = fopen( filename, "wb");
+  output = fopen( filename, "w" );
   if( output ==NULL ) return;
 
-  ply = write_ply( output, 2, elem_names, PLY_BINARY_LE );
+  ply = write_ply( output, 2, elem_names, PLY_ASCII );
 /*
   Describe what properties go into the vertex elements.
 */
@@ -166,11 +169,11 @@ parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = NULL;
+  opts->output_filename = "test.ply";
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "bourkeply test",
-               "This program simply reads and optionally writes an input ply file" );
+               "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
   msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",
@@ -209,14 +212,14 @@ main( int argc, char** argv )
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
+  msh_cprintf( opts.verbose, "N. Verts : %d;N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;
-  // msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
-  //                             test_idx, 
-  //                             mesh.vertices[test_idx].x,
-  //                             mesh.vertices[test_idx].y,
-  //                             mesh.vertices[test_idx].z );
+  msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
+                              test_idx, 
+                              mesh.vertices[test_idx].x,
+                              mesh.vertices[test_idx].y,
+                              mesh.vertices[test_idx].z );
   msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
                               test_idx, 
                               mesh.faces[test_idx].vertex_indices[0],

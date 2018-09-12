@@ -5,13 +5,15 @@ Description: Benchmarking the read and write capabilities of rply by Diego Nehab
 Setting is simple - getting positions and vertex_indices from a ply file that describes
 triangular mesh.
 License: Public Domain
+
 Compilation:
-clang -I<path_to_msh> -Irply/ -O3 -std=c11 rply/rply.c rply_test.c -o bin/rply_test
+gcc -I<path_to_msh> -Irply/ -O2 -std=c11 rply/rply.c rply_test.c -o bin/rply_test
+
 Notes:
-- I might be missing how to properly use this library.
 - User needs to generate both requested types and approperiate callbacks to read the data.
 */
 
+#define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #include "msh/msh_std.h"
@@ -161,11 +163,11 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = NULL;
+  opts->output_filename = "test.ply";
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "rply test",
-               "This program simply reads and optionally writes an input ply file" );
+               "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
   msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",

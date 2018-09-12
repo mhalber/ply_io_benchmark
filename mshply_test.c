@@ -5,10 +5,13 @@ Description: Benchmarking the read and write capabilities of mshply
 Setting is simple - getting positions and vertex_indices from a ply file that describes
 triangular mesh.
 License: Public Domain
+
 Compilation:
-clang -I<path_to_msh> -Imshply/ -O3 -std=c11 mshply_test.c -o bin/mshply_test
+clang -I<path_to_msh> -Imshply/ -O2 -std=c11 mshply_test.c -o bin/mshply_test
+
 */
 
+#define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #define MSH_PLY_IMPLEMENTATION
@@ -93,11 +96,11 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = NULL;
+  opts->output_filename = "test.ply";
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "mshply test",
-               "This program simply reads and optionally writes an input ply file" );
+               "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
   msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",
@@ -135,9 +138,8 @@ main( int argc, char** argv )
   t2 = msh_time_now();
   double write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
-
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose && opts.output_filename, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d\n", mesh.n_verts, mesh.n_faces );
 
   int test_idx = 1024;

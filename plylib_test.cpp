@@ -8,8 +8,10 @@ Example adapred from: https://github.com/cnr-isti-vclab/vcglib/blob/master/wrap/
 Setting is simple - getting positions and vertex_indices from a ply file that describes
 triangular mesh.
 License: Public Domain
+
 Compilation:
-clang++ -I<path_to_msh> -Iplylib/ -O3 -std=c++11 plylib/plylib.cpp plylib_test.cpp -o bin/plylib_test
+g++ -I<path_to_msh> -Iplylib/ -O2 -std=c++11 plylib/plylib.cpp plylib_test.cpp -o bin/plylib_test
+
 Notes: 
 - Poor docs, hard to use
 - Requires additional datastructures that try to predict everything(?)
@@ -17,6 +19,7 @@ Notes:
 - Plylib does not have write support, writing is adapted as a separate function from:
   (https://github.com/cnr-isti-vclab/vcglib/blob/master/wrap/io_trimesh/export_ply.h)
 */
+
 #include <thread>
 #include <vector>
 #include <sstream>
@@ -24,6 +27,7 @@ Notes:
 #include <iostream>
 #include "plylib.h"
 
+#define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #include "msh/msh_std.h"
@@ -226,11 +230,11 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = NULL;
+  opts->output_filename = (char*)"test.ply";
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "mshply test",
-               "This program simply reads and optionally writes an input ply file" );
+               "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
   msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",

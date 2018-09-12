@@ -1,19 +1,22 @@
 /*
 Author: Maciej Halber
-Data: 04/09/18
+Data: 08/12/18
 Description: Benchmarking the read and write capabilities of tinyply by @ddiakopoulos
 Setting is simple - getting positions and vertex_indices from a ply file that describes
 triangular mesh.
-
 License: Public Domain
+
 Compilation:
-clang++ -I<path_to_msh> -Itinyply/ -O3 -std=c++11 tinyply/tinyply.cpp tinyply2_test.cpp -o bin/tinyply2_test
+g++ -I<path_to_msh> -Itinyply/ -O2 -std=c++11 tinyply2_test.cpp -o bin/tinyply2_test
+
 Notes:
 - No way to do non-triangle meshes?
 */
 
+#define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
+#define TINYPLY_IMPLEMENTATION
 #include "msh/msh_std.h"
 #include "msh/msh_argparse.h"
 
@@ -96,11 +99,11 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = NULL;
+  opts->output_filename = (char*)"test.ply";
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "bourkeply test",
-               "This program simply reads and optionally writes an input ply file" );
+               "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
   msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",
@@ -137,8 +140,8 @@ main( int argc, char** argv )
   float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;
   msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",

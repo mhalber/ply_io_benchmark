@@ -5,13 +5,16 @@ Description: Benchmarking the read and write capabilities of nanoply by @cnr-ist
 Setting is simple - getting positions and vertex_indices from a ply file that describes
 triangular mesh.
 License: Public Domain
+
 Compilation:
-clang++ -I<path_to_msh> -Inanoply/ -O3 -std=c++11 nanoply_test.cpp -o bin/nanoply_test
+g++ -I<path_to_msh> -Inanoply/ -O2 -std=c++11 nanoply_test.cpp -o bin/nanoply_test
+
 Notes: 
 - No way to do non-triangle meshes?
 - I had modify name property list variable for vertiex indices to say vertex_indices instead of vertex_index
    Line 249 of original nanoply. Not sure if I am using library wrong..
 */
+
 #include <thread>
 #include <vector>
 #include <sstream>
@@ -20,6 +23,7 @@ Notes:
 #include <cstring>
 #include "nanoply.hpp"
 
+#define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #include "msh/msh_std.h"
@@ -136,11 +140,11 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = NULL;
+  opts->output_filename = (char*)"test.ply";
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "nanoply test",
-               "This program simply reads and optionally writes an input ply file" );
+               "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
   msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",
@@ -177,8 +181,8 @@ main( int argc, char** argv )
   float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;
   msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",

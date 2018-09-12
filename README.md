@@ -36,13 +36,15 @@ Below is a list of libraries used in this benchmark:
  
 - [rply](http://w3.impa.br/~diego/software/rply/) - a ply io library by Diego Nehab
 
-- [mshply](https://github.com/mhalber/msh) - a single-header c ply io library by myself
+- [msh_ply](https://github.com/mhalber/msh) - a single-header c ply io library by myself
+
+- [happly](https://github.com/nmwsharp/happly) - a single-header c++ ply io library by Nicolas Sharp
 
 - [nanoply](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/nanoply) - a single-header c++ ply io library taken from vcglib
 
 - [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) - a ply io library taken from vcglib (meshlab ply io(?))
 
-- [tinyply](https://github.com/ddiakopoulos/tinyply) - a ply io library by Dimitri Diakopoulos
+- [tinyply](https://github.com/ddiakopoulos/tinyply) - a ply io library by Dimitri Diakopoulos. This benchmark includes versions 2.1 and 2.2 of the library
 
 For an example of usage of each library, as well as some additional comments about each of the libraries please check the *_test.c(pp)
 files.
@@ -51,7 +53,7 @@ files.
 
 All tests were performed using MSI GS5 laptop with i7-8750H, 16GB of ram and SATA SSD.
 
-All programs were compiled gcc 7.3, with -O3 flag.
+All programs were compiled gcc 7.3, with -O2 flag.
 
 Each program was run 10 times for each model. Numbers reported below are average timings in milliseconds.
 First number is the read time and second number is the write time. Best numbers for a given model are in bold.

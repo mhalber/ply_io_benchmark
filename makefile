@@ -2,10 +2,10 @@
 
 CC=gcc
 CPP=g++
-CFLAGS=-O2 -march=native -std=c11
-CPPFLAGS=-O2 -march=native -std=c++11
+CFLAGS=-O3 -march=native -std=c11
+CPPFLAGS=-O3 -march=native -std=c++11
 
-MSH_DIR=../dev/
+MSH_DIR=../../dev/
 
 all:
 	$(CC)  -I$(MSH_DIR) -Iturkply/ $(CFLAGS) turkply/ply_io.c turkply_test.c -o bin/turkply_test

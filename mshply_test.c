@@ -11,7 +11,7 @@ clang -I<path_to_msh> -Imshply/ -O2 -std=c11 mshply_test.c -o bin/mshply_test
 
 */
 
-#define MSH_STD_INCLUDE_HEADERS
+#define MSH_STD_INCLUDE_LIBC_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #define MSH_PLY_IMPLEMENTATION
@@ -38,8 +38,8 @@ typedef struct tri
 
 typedef struct triangle_mesh
 {
-  int n_verts;
-  int n_faces;
+  size_t n_verts;
+  size_t n_faces;
   Vec3f* vertices;
   Tri* faces;
 } TriMesh;

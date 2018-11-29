@@ -13,7 +13,8 @@ Notes:
 - No way to do non-triangle meshes?
 */
 
-#define MSH_STD_INCLUDE_HEADERS
+
+#define MSH_STD_INCLUDE_LIBC_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #include "msh/msh_std.h"

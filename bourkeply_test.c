@@ -20,6 +20,7 @@ Notes:
   - Auxiliary data idea could be utilized to get the tris.
 */
 
+#define MSH_STD_INCLUDE_LIBC_HEADERS
 #define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION

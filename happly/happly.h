@@ -1485,7 +1485,6 @@ private:
       }
 
       for (size_t iEntry = 0; iEntry < elem.count; iEntry++) {
-
         string line;
         std::getline(inStream, line);
 

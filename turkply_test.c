@@ -15,11 +15,12 @@ Notes:
 - turk's ply does not deal with the endianness correctly
 - turk's ply used drand48() which is posix function, not available on Windows.
   Replaced it with (float)rand()/(float)(RAND_MAX)
+- Seems to have issues writing binary files?
 
 NOTE: The examples are based on Greg Turk code from 94
 */
 
-#define MSH_STD_INCLUDE_HEADERS
+#define MSH_STD_INCLUDE_LIBC_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
 #include "msh/msh_std.h"
@@ -125,7 +126,7 @@ write_ply_file( char* filename, const TriMesh* mesh )
   output = fopen( filename, "w" );
   if( output ==NULL ) return;
 
-  ply = write_ply( output, 2, elem_names, PLY_ASCII );
+  ply = write_ply( output, 2, elem_names, PLY_BINARY_LE );
 /*
   Describe what properties go into the vertex elements.
 */

@@ -17,6 +17,7 @@ Notes:
 #include <cstring>
 #include "happly.h"
 
+#define MSH_STD_INCLUDE_LIBC_HEADERS
 #define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION
@@ -51,8 +52,7 @@ typedef struct triangle_mesh
 void
 read_ply( const char* filename, TriMesh* mesh)
 {
-  happly::PLYData plyIn( filename );
-
+  happly::PLYData plyIn( filename, false );
   std::vector<float> x_pos   = plyIn.getElement("vertex").getProperty<float>("x");
   std::vector<float> y_pos   = plyIn.getElement("vertex").getProperty<float>("y");
   std::vector<float> z_pos   = plyIn.getElement("vertex").getProperty<float>("z");
@@ -154,6 +154,7 @@ main( int argc, char** argv )
   write_ply( opts.output_filename, &mesh );
   t2 = msh_time_now();
   float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
+  
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );

@@ -27,6 +27,7 @@ Notes:
 #include <iostream>
 #include "plylib.h"
 
+#define MSH_STD_INCLUDE_LIBC_HEADERS
 #define MSH_STD_INCLUDE_HEADERS
 #define MSH_STD_IMPLEMENTATION
 #define MSH_ARGPARSE_IMPLEMENTATION

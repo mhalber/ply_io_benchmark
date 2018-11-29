@@ -2,7 +2,7 @@
 
 This repository contains a simple benchmark comparing various libraries for input/output of ply files.
 
-For this benchmark we use models from the [Stanford 3D Scaning Repository](http://graphics.stanford.edu/data/3Dscanrep/).
+For this benchmark we use models from the [Stanford 3D Scaning Repository](http://graphics.stanford.edu/data/3Dscanrep/), an example scan from [Scannet dataset](http://www.scan-net.org/) (scene_0402_00) and Suzanne model from Blender.
 In addition to models provided in repository, we have added cube and subdivided suzanne models as a baseline. We have also added little endian variation of each model as well as ascii variation of armadillo. Variations were created
 by exporting meshes using Meshlab.
 
@@ -14,17 +14,18 @@ The writing task is to write out the read file back as a little endian binary fi
 
 **Model stats:**
 
-|     Model Name    | N. Vertices |  N. Tris |
-|:-----------------:|:-----------:|:--------:|
-| armadillo         |      172974 |   345944 |
-| bunny             |       35947 |    69451 |
-| cube              |           8 |       12 |
-| dragon            |      437645 |   871414 |
-| happy_buddha      |      543652 |  1087716 |
-| lucy              |    14027872 | 28055742 |
-| suzanne           |        7958 |    15744 |
-| xyzrgb_dragon     |     3609600 |  7219045 |
-| xyzrgb_statuette  |     4999996 | 10000000 |
+|     Model Name       | N. Vertices |  N. Tris |
+|:--------------------:|:-----------:|:--------:|
+| armadillo            |      172974 |   345944 |
+| bunny                |       35947 |    69451 |
+| cube                 |           8 |       12 |
+| dragon               |      437645 |   871414 |
+| happy_buddha         |      543652 |  1087716 |
+| lucy                 |    14027872 | 28055742 |
+| suzanne              |        7958 |    15744 |
+| scannet_scene0402_00 |       93834 | 177518   |
+| xyzrgb_dragon        |     3609600 |  7219045 |
+| xyzrgb_statuette     |     4999996 | 10000000 |
 
 ## Libraries
 

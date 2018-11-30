@@ -67,7 +67,7 @@ read_ply( const char* filename, TriMesh* mesh)
   
   std::shared_ptr<PlyData> verts, faces;
   verts = file.request_properties_from_element("vertex", {"x", "y", "z"});
-  faces = file.request_properties_from_element("face", { "vertex_indices" });
+  faces = file.request_properties_from_element("face", { "vertex_indices" }, 3);
 
   file.read(ss);
   {

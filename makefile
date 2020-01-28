@@ -16,4 +16,6 @@ all:
 	$(CPP) -I$(MSH_DIR) -Ihapply/ $(CPPFLAGS) happly_test.cpp -o bin/happly_test
 	$(CPP) -I$(MSH_DIR) -Itinyply2.1/ $(CPPFLAGS) tinyply2.1/tinyply.cpp tinyply21_test.cpp -o bin/tinyply21_test
 	$(CPP) -I$(MSH_DIR) -Itinyply2.2/ $(CPPFLAGS) tinyply22_test.cpp -o bin/tinyply22_test
+	$(CPP) -I$(MSH_DIR) -Itinyply2.3/ $(CPPFLAGS) tinyply23_test.cpp -o bin/tinyply22_test
 	$(CPP) -I$(MSH_DIR) -Iplylib/ $(CPPFLAGS) plylib/plylib.cpp plylib_test.cpp -o bin/plylib_test
+	$(CPP) -I$(MSH_DIR) -Iminiply/ $(CPPFLAGS) miniply/miniply.cpp miniply_test.cpp -o bin/miniply_test

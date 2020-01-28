@@ -122,6 +122,7 @@ def output_result_table(results_folder):
   plt.yticks(np.arange(n_methods), method_names)
   plt.tight_layout()
   plt.show()
+  plt.savefig('benchmark.png')
 
 
 def parse_arguments():

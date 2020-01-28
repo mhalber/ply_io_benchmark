@@ -1,6 +1,39 @@
 # Ply File I/O Benchmark
 
-This repository contains a simple benchmark comparing various libraries for input/output of ply files.
+This repository contains a code for comparison of various libraries for input and output of PLY files. [PLY file format](https://en.wikipedia.org/wiki/PLY_(file_format)) has been developed at Stanford University by [Greg Turk](https://www.cc.gatech.edu/~turk/) as a part of the (real-world object digitization project)[http://graphics.stanford.edu/data/3Dscanrep/] undertaken by Stanford University in mid-90s.
+
+## Task ##
+The task is to read and write a basic triangle mesh stored in a PLY file into memory. The triangle mesh is represented as a list of vertices and a list of indices into that list, indicating which triplets of vertices make a triangle. 
+
+The data structure we wish to populate is:
+~~~~
+typedef struct vec3f
+{
+  float x,y,z;
+} Vec3f;
+
+typedef struct tri
+{
+  int index1, index2, index3;
+} Tri;
+
+typedef struct triangle_mesh
+{
+  int n_verts;
+  int n_faces;
+  Vec3f* vertices;
+  Tri* faces;
+} TriMesh;
+~~~~
+
+The meshes we are testing were processed to contain only the position attribute and only triangles. As such this task aims to measure the speed at which each library is able to exchange simple triangular mesh data. For performance on an alternative task where non-trianglar meshes with more per-vertex attributes are tested, see [Vilya Harvey's ply-parsing-perf](https://github.com/vilya/ply-parsing-perf).  
+
+## Models ##
+
+
+
+
+This repository contains a simple benchmark comparing various libraries for input/output of ply files. 
 
 For this benchmark we use models from the [Stanford 3D Scaning Repository](http://graphics.stanford.edu/data/3Dscanrep/), an example scan from [Scannet dataset](http://www.scan-net.org/) (scene_0402_00) and Suzanne model from Blender.
 In addition to models provided in repository, we have added cube and subdivided suzanne models as a baseline. We have also added little endian variation of each model as well as ascii variation of armadillo. Variations were created
@@ -14,16 +47,17 @@ The writing task is to write out the read file back as a little endian binary fi
 
 **Model stats:**
 
+https://www.cc.gatech.edu/projects/large_models/index.html
+
 |     Model Name       | N. Vertices |  N. Tris |
 |:--------------------:|:-----------:|:--------:|
 | armadillo            |      172974 |   345944 |
 | bunny                |       35947 |    69451 |
-| cube                 |           8 |       12 |
 | dragon               |      437645 |   871414 |
 | happy_buddha         |      543652 |  1087716 |
 | lucy                 |    14027872 | 28055742 |
+| scannet_scene0402_00 |       93834 |   177518 |
 | suzanne              |        7958 |    15744 |
-| scannet_scene0402_00 |       93834 | 177518   |
 | xyzrgb_dragon        |     3609600 |  7219045 |
 | xyzrgb_statuette     |     4999996 | 10000000 |
 

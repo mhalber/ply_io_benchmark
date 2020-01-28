@@ -102,7 +102,7 @@ int parse_arguments( int argc, char**argv, Opts* opts)
   opts->output_filename = (char*)"test.ply";
   opts->verbose         = 0;
 
-  msh_ap_init( &parser, "bourkeply test",
+  msh_ap_init( &parser, "tinyply21 test",
                "This program simply reads and writes an input ply file" );
   msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
                            &opts->input_filename, 1 );
@@ -133,11 +133,11 @@ main( int argc, char** argv )
   t1 = msh_time_now();
   read_ply( opts.input_filename, &mesh );
   t2 = msh_time_now();
-  float read_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
+  float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
   write_ply( opts.output_filename, &mesh );
   t2 = msh_time_now();
-  float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
+  float write_time = msh_time_diff_ms( t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );

@@ -38,7 +38,7 @@ typedef struct vec3f
 
 typedef struct tri
 {
-  int i1, i2, i3;
+  int index1, index2, index3;
 } Tri;
 
 typedef struct triangle_mesh
@@ -152,9 +152,9 @@ write_ply( const char* filename, const TriMesh* mesh )
   for( uint32_t i = 0; i < mesh->n_faces; ++i ) 
   {
     ply_write( ply, 3 );
-    ply_write( ply, mesh->faces[i].i1 );
-    ply_write( ply, mesh->faces[i].i2 );
-    ply_write( ply, mesh->faces[i].i3 );
+    ply_write( ply, mesh->faces[i].index1 );
+    ply_write( ply, mesh->faces[i].index2 );
+    ply_write( ply, mesh->faces[i].index3 );
   }
 
   ply_close(ply);
@@ -178,7 +178,6 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 
   if( !msh_ap_parse(&parser, argc, argv) )
   {
-    msh_ap_display_help( &parser );
     return 1;
   }
   return 0;
@@ -198,11 +197,11 @@ main( int argc, char** argv )
   t1 = msh_time_now();
   read_ply( opts.input_filename, &mesh );
   t2 = msh_time_now();
-  float read_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
+  float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
   write_ply( opts.output_filename, &mesh );
   t2 = msh_time_now();
-  float write_time = msh_time_diff( MSHT_MILLISECONDS, t2, t1 );
+  float write_time = msh_time_diff_ms( t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
@@ -216,9 +215,9 @@ main( int argc, char** argv )
                               mesh.vertices[test_idx].z );
   msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
                               test_idx, 
-                              mesh.faces[test_idx].i1,
-                              mesh.faces[test_idx].i2,
-                              mesh.faces[test_idx].i3 );
+                              mesh.faces[test_idx].index1,
+                              mesh.faces[test_idx].index2,
+                              mesh.faces[test_idx].index3 );
 
   return 0;
 }

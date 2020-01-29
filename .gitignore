@@ -2,6 +2,8 @@
 .DS_Store
 bin
 bin/**
+tmp_bin
+tmp_bin/**
 results
 results/**
 *.sh

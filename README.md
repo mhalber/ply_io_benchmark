@@ -26,12 +26,62 @@ typedef struct triangle_mesh
 } TriMesh;
 ~~~~
 
-The meshes we are testing were processed to contain only the position attribute and only triangles. As such this task aims to measure the speed at which each library is able to exchange simple triangular mesh data. For performance on an alternative task where non-trianglar meshes with more per-vertex attributes are tested, see [Vilya Harvey's ply-parsing-perf](https://github.com/vilya/ply-parsing-perf).  
+The meshes we are testing were processed to contain only the position attribute and only triangles. As such this task aims to measure the speed at which each library is able to exchange simple triangular mesh data. Each of the meshes is tested using both binary and text(ASCII) formats, as supported by PLY file format. 
 
-## Models ##
+For performance on an alternative task where non-trianglar meshes with more per-vertex attributes are tested, see [Vilya Harvey's ply-parsing-perf](https://github.com/vilya/ply-parsing-perf).  
+
+### Test Models ###
+
+Table below lists models used for this benchmark, along with the source.
+
+|     Model Name                | N. Vertices |  N. Tris | Source |
+|:-----------------------------:|:-----------:|:--------:|:------:|
+| suzanne                       |        7958 |    15744 | Blender
+| scannet_scene0402_00          |       93834 |   177518 | [Scannet](http://www.scan-net.org/)
+| angel                         |      237018 |   474048 | [Large Geometric Models Archvive]
+| blade                         |      882954 |  1765388 | [Large Geometric Models Archvive]
+| hand                          |      327323 |   654666 | [Large Geometric Models Archvive]
+| horse                         |      48485  |    96966 | [Large Geometric Models Archvive]
+| armadillo                     |      172974 |   345944 | [Stanford 3D Scaning Repository]
+| bunny                         |       35947 |    69451 | [Stanford 3D Scaning Repository]
+| dragon                        |      437645 |   871414 | [Stanford 3D Scaning Repository]
+| happy_buddha                  |      543652 |  1087716 | [Stanford 3D Scaning Repository]
+| lucy                          |    14027872 | 28055742 | [Stanford 3D Scaning Repository]
+| xyzrgb_dragon                 |     3609600 |  7219045 | [Stanford 3D Scaning Repository]
+| xyzrgb_statuette              |     4999996 | 10000000 | [Stanford 3D Scaning Repository]
+| bust_of_sappho                |      140864 |   281724 | [Thingiverse](https://www.thingiverse.com/thing:14565)
+| statue                        |      999517 |  1999038 | [Sketchfab](https://sketchfab.com/3d-models/william-huskisson-statue-ee9ce7c99f2d4b40aa46aaffb02bf21d)
+| speeder_bike                  |     1473341 |  2947046 | [Sketchfab](https://sketchfab.com/3d-models/speeder-bike-from-star-wars-galaxys-edge-dcddea22a0674737b4201a025a27a94d)
+| armchair                      |       11558 |    23102 | [Sketchfab](https://sketchfab.com/3d-models/lounger-armchair-e9d9d87c32f144e2873765e66814f727)
+| bust_of_angelique_dhannetaire |      250000 |   500000 | [Sketchfab](https://sketchfab.com/3d-models/bust-of-angelique-dhannetaire-26c23265310a4e45aaa296d02db83cb2)
+
+## Libraries
+
+Below is a list of libraries used in this benchmark:
+
+- [turkply](https://people.sc.fsu.edu/~jburkardt/c_src/ply_io/ply_io.html) - original PLY library by Greg Turk 
+
+- [bourkeply](http://paulbourke.net/dataformats/ply/) - as far as I can tell it is a Paul Bourke modification of the original Turk's code 
+ 
+- [rply](http://w3.impa.br/~diego/software/rply/) - a PLY I/O library by Diego Nehab
+
+- [msh_ply](https://github.com/mhalber/msh) - a single-header c PLY I/O library by myself
+
+- [happly](https://github.com/nmwsharp/happly) - a single-header c++ PLY I/O library by Nicolas Sharp
+
+- [miniply](https://github.com/vilya/miniply) - a PLY reading library by Vilya Harper
+
+- [nanoply](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/nanoply) - a single-header c++ PLY I/O library taken from vcglib
+
+- [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) - a PLY I/O library taken from vcglib (PLY reading/writing used by Meshlab(?) )
+
+- [tinyply](https://github.com/ddiakopoulos/tinyply) - a PLY I/O library by Dimitri Diakopoulos. This benchmark includes versions 2.1, 2.2 and 2.3 of the library
+
+For the usage example, as well as some additional comments about each of the libraries please check the *_test.c(pp) files.
 
 
 
+<!-- 
 
 This repository contains a simple benchmark comparing various libraries for input/output of ply files. 
 
@@ -47,19 +97,7 @@ The writing task is to write out the read file back as a little endian binary fi
 
 **Model stats:**
 
-https://www.cc.gatech.edu/projects/large_models/index.html
 
-|     Model Name       | N. Vertices |  N. Tris |
-|:--------------------:|:-----------:|:--------:|
-| armadillo            |      172974 |   345944 |
-| bunny                |       35947 |    69451 |
-| dragon               |      437645 |   871414 |
-| happy_buddha         |      543652 |  1087716 |
-| lucy                 |    14027872 | 28055742 |
-| scannet_scene0402_00 |       93834 |   177518 |
-| suzanne              |        7958 |    15744 |
-| xyzrgb_dragon        |     3609600 |  7219045 |
-| xyzrgb_statuette     |     4999996 | 10000000 |
 
 ## Libraries
 
@@ -81,8 +119,7 @@ Below is a list of libraries used in this benchmark:
 
 - [tinyply](https://github.com/ddiakopoulos/tinyply) - a ply io library by Dimitri Diakopoulos. This benchmark includes versions 2.1 and 2.2 of the library
 
-For an example of usage of each library, as well as some additional comments about each of the libraries please check the *_test.c(pp)
-files.
+For an example of usage of each library, as well as some additional comments about each of the libraries please check the *_test.c(pp) files.
 
 ### Timing plots
 Below we provide timing plots showing read times for different librarties and models, in log-scale.
@@ -162,18 +199,20 @@ of read function without any error reporting etc.
 | bourkeply |    55       |   33      |
 | mshply    |    24       |   24      |
 | nanoply   |    23       |   29      |
-| plylib    |    78       |   1(65)*  |
+| plylib    |    78       |   65*     |
 | rply      |    69       |   23      |
 | happly    |  **17**     |   26      |
 | tinyply   |  **17**     | **10**    |
 | turkply   |    52       |   39      |
 
 \* - plylib does not support writing files explicitly. I have simply copied and simplified **Save** function from
-[vcglib source](https://github.com/cnr-isti-vclab/vcglib/blob/master/wrap/io_trimesh/export_ply.h). Number in
-parenthesis is the number of lines in that simplified function.
+[vcglib source](https://github.com/cnr-isti-vclab/vcglib/blob/master/wrap/io_trimesh/export_ply.h). 
 
 ## Notes
 
 1. The speed of msh_ply for triangular meshes comes from the list size hint - if provided program can assume that all faces have constant number of vertices and can just parse all vertex indices data in one go. I'll try to provide benchmark showing how not setting that variables affects the read result.
 
-2. If you have any comments about/issues with the methodology used in this benchmark or would like to see additional libraries/models tested, please create an issue. I'd be very happy to improve this benchmark and make it more informative
+2. If you have any comments about/issues with the methodology used in this benchmark or would like to see additional libraries/models tested, please create an issue. I'd be very happy to improve this benchmark and make it more informative -->
+
+[Large Geometric Models Archvive]: https://www.cc.gatech.edu/projects/large_models/index.html
+[Stanford 3D Scaning Repository]: (http://graphics.stanford.edu/data/3Dscanrep/)

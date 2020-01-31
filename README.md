@@ -1,8 +1,8 @@
 # Ply File I/O Benchmark
 
-This repository contains a code for comparison of various libraries for input and output of PLY files. [PLY file format](https://en.wikipedia.org/wiki/PLY_(file_format)) has been developed at Stanford University by [Greg Turk](https://www.cc.gatech.edu/~turk/) as a part of the (real-world object digitization project)[http://graphics.stanford.edu/data/3Dscanrep/] undertaken by Stanford University in mid-90s.
+This repository contains a code for comparison of various libraries for input and output of PLY files. [PLY file format](https://en.wikipedia.org/wiki/PLY_(file_format)) has been developed at Stanford University by [Greg Turk](https://www.cc.gatech.edu/~turk/) as a part of the [real-world object digitization project](http://graphics.stanford.edu/data/3Dscanrep/) undertaken by Stanford University in mid-90s.
 
-## Task ##
+## Task
 The task is to read and write a basic triangle mesh stored in a PLY file into memory. The triangle mesh is represented as a list of vertices and a list of indices into that list, indicating which triplets of vertices make a triangle. 
 
 The data structure we wish to populate is:
@@ -30,7 +30,7 @@ The meshes we are testing were processed to contain only the position attribute 
 
 For performance on an alternative task where non-trianglar meshes with more per-vertex attributes are tested, see [Vilya Harvey's ply-parsing-perf](https://github.com/vilya/ply-parsing-perf).  
 
-### Test Models ###
+### Test Models
 
 Table below lists models used for this benchmark, along with the source.
 
@@ -79,6 +79,52 @@ Below is a list of libraries used in this benchmark:
 
 For the usage example, as well as some additional comments about each of the libraries please check the *_test.c(pp) files.
 
+## Results
+
+Below we present results for parsing PLY files storing data in both ASCII and binary format (little endian). Times are given in milliseconds. Highlighted numbers indicate the best method in each category.
+
+The benchmark was compiled using gcc 8.3, with -O3 level of optimization.
+
+*Disclamer: I am the author of msh_ply library. If you see any deficiencies in code for other libraries, don't hesitate to let me know - I hope to make this benchmark as fair as possible.*
+
+### Average Read Times
+
+|Method     |           ASCII    |           Binary   |
+|----------:|-------------------:|-------------------:|
+|bourkeply  |    2477.431 (8.3x) |     508.893 (8.9x) |
+|happly     |  24713.890 (82.7x) |   2318.877 (40.5x) |
+|miniply    |  **298.979 (1.0x)**|      72.775 (1.3x) |
+|mshply     |    2176.058 (7.3x) |   **57.250 (1.0x)**|
+|nanoply    |  13979.778 (46.8x) |      93.578 (1.6x) |
+|plylib     |   9605.602 (32.1x) |    631.308 (11.0x) |
+|rply       |   3945.454 (13.2x) |     298.244 (5.2x) |
+|tinyply21  |  15835.790 (53.0x) |   1821.167 (31.8x) |
+|tinyply22  |  13637.762 (45.6x) |     423.470 (7.4x) |
+|tinyply23  |  13603.095 (45.5x) |     543.307 (9.5x) |
+|turkply    |    2377.470 (8.0x) |    832.714 (14.5x) |
+
+### Average Write Times
+
+|Method     |           ASCII    |           Binary   |
+|----------:|-------------------:|-------------------:|
+|bourkeply  |     696.566 (3.6x) |      318.284(1.7x) | <!-- Does this even work >
+|happly     |   2097.650 (10.7x) |    1912.975(10.1x) |
+|miniply    |                N/A |                N/A |
+|mshply     | **195.249 (1.0x)** | **189.043(1.0x)** |
+|nanoply    |   5211.672 (26.7x) |   5244.949(27.7x) |
+|plylib     |     373.957 (1.9x) |    373.507(2.0x)  |
+|rply       |     236.461 (1.2x) |    236.181(1.2x)  |
+|tinyply21  |    1194.343 (6.1x) |   1196.465(6.3x)  |
+|tinyply22  |     665.850 (3.4x) |    671.993(3.6x)  |
+|tinyply23  |     666.219 (3.4x) |    717.330(3.8x)  |
+|turkply    |     751.583 (3.8x) |    735.753(3.9x)  | <!-- Does this even work >
+
+*Note: miniply does not support writing of ply files.*
+
+### Per model read times:
+
+[Read Times Table]() [Read Times Image]()
+[Write Times Table]() [Write Times Image]()
 
 
 <!-- 
@@ -105,8 +151,6 @@ Below is a list of libraries used in this benchmark:
 
 - [turkply](https://people.sc.fsu.edu/~jburkardt/c_src/ply_io/ply_io.html) - original PLY library by Greg Turk 
 
-- [bourkeply](http://paulbourke.net/dataformats/ply/) - as far as I can tell it is a Paul Bourke modification of original Turk's code 
- 
 - [rply](http://w3.impa.br/~diego/software/rply/) - a ply io library by Diego Nehab
 
 - [msh_ply](https://github.com/mhalber/msh) - a single-header c ply io library by myself

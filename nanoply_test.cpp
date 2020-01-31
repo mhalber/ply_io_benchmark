@@ -56,10 +56,11 @@ typedef struct triangle_mesh
 } TriMesh;
 
 void
-read_ply( const char* filename, TriMesh* mesh)
+read_ply( const char* filename, TriMesh* mesh, bool *is_binary )
 {
   // Get file info
-  nanoply::Info info(filename);
+  nanoply::Info info( filename );
+  *is_binary = info.binary;
 
   // Prepare the mesh contents
   mesh->n_verts = info.GetVertexCount();
@@ -82,6 +83,8 @@ read_ply( const char* filename, TriMesh* mesh)
 
   // Open the file and save the element data according the relative element descriptor
   OpenModel(info, meshDescr);
+
+  // Cleanup
   for (int i = 0; i < vertex.dataDescriptor.size(); i++)
     delete vertex.dataDescriptor[i];
   for (int i = 0; i < face.dataDescriptor.size(); i++)
@@ -89,7 +92,7 @@ read_ply( const char* filename, TriMesh* mesh)
 }
 
 void
-write_ply( const char* filename, const TriMesh* mesh )
+write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
 {
  //Create the vector of vertex properties to save in the file
   std::vector<nanoply::PlyProperty> vertexProp;
@@ -106,7 +109,7 @@ write_ply( const char* filename, const TriMesh* mesh )
   //Create the Info object with the data to save in the header
   nanoply::Info infoSave;
   infoSave.filename = filename;
-  infoSave.binary = false;
+  infoSave.binary = is_binary;
   infoSave.AddPlyElement(vertexElem);
   infoSave.AddPlyElement(faceElem);
 
@@ -155,7 +158,6 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 
   if( !msh_ap_parse(&parser, argc, argv) )
   {
-    msh_ap_display_help( &parser );
     return 1;
   }
   return 0;
@@ -171,13 +173,15 @@ main( int argc, char** argv )
   int parse_err = parse_arguments( argc, argv, &opts );
   if( parse_err ) { return 1; }
 
+  bool is_binary = false;
+
   msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
-  read_ply( opts.input_filename, &mesh );
+  read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh );
+  write_ply( opts.output_filename, &mesh, is_binary );
   t2 = msh_time_now();
   float write_time = msh_time_diff_ms( t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );

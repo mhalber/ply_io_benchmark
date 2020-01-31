@@ -38,7 +38,7 @@ typedef struct vec3f
 
 typedef struct tri
 {
-  int index1, index2, index3;
+  int i1, i2, i3;
 } Tri;
 
 typedef struct triangle_mesh
@@ -91,7 +91,7 @@ static int read_face_cb(p_ply_argument argument) {
 }
 
 void
-read_ply( const char* filename, TriMesh* mesh)
+read_ply( const char* filename, TriMesh* mesh, bool* is_binary )
 {
   p_ply ply = ply_open(filename, NULL, 0, NULL);
   if (!ply) return;
@@ -120,6 +120,7 @@ read_ply( const char* filename, TriMesh* mesh)
   ply_set_read_cb(ply, "vertex", "z", read_vertex_cb, mesh, 2);
   ply_set_read_cb(ply, "face", "vertex_indices", read_face_cb, mesh, 0);
   if (!ply_read(ply)) return;
+  *is_binary = (ply_get_storage_mode(ply) != PLY_ASCII); 
   ply_close(ply);
   return;
 }
@@ -127,9 +128,10 @@ read_ply( const char* filename, TriMesh* mesh)
 
 //NOTE: This is based on example found in wjakob instant-meshes implementation
 void
-write_ply( const char* filename, const TriMesh* mesh )
+write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
 {
-  p_ply ply = ply_create(filename, PLY_LITTLE_ENDIAN, NULL, 0, NULL);
+  e_ply_storage_mode mode = is_binary ? PLY_LITTLE_ENDIAN : PLY_ASCII;
+  p_ply ply = ply_create(filename, mode, NULL, 0, NULL);
   if (!ply) return;
   ply_add_element( ply, "vertex", mesh->n_verts );
   ply_add_scalar_property( ply, "x", PLY_FLOAT );
@@ -152,9 +154,9 @@ write_ply( const char* filename, const TriMesh* mesh )
   for( uint32_t i = 0; i < mesh->n_faces; ++i ) 
   {
     ply_write( ply, 3 );
-    ply_write( ply, mesh->faces[i].index1 );
-    ply_write( ply, mesh->faces[i].index2 );
-    ply_write( ply, mesh->faces[i].index3 );
+    ply_write( ply, mesh->faces[i].i1 );
+    ply_write( ply, mesh->faces[i].i2 );
+    ply_write( ply, mesh->faces[i].i3 );
   }
 
   ply_close(ply);
@@ -193,18 +195,20 @@ main( int argc, char** argv )
   int parse_err = parse_arguments( argc, argv, &opts );
   if( parse_err ) { return 1; }
 
+  bool is_binary = false;
+
   msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
-  read_ply( opts.input_filename, &mesh );
+  read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh );
+  write_ply( opts.output_filename, &mesh, is_binary );
   t2 = msh_time_now();
   float write_time = msh_time_diff_ms( t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;
@@ -215,9 +219,9 @@ main( int argc, char** argv )
                               mesh.vertices[test_idx].z );
   msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
                               test_idx, 
-                              mesh.faces[test_idx].index1,
-                              mesh.faces[test_idx].index2,
-                              mesh.faces[test_idx].index3 );
+                              mesh.faces[test_idx].i1,
+                              mesh.faces[test_idx].i2,
+                              mesh.faces[test_idx].i3 );
 
   return 0;
 }

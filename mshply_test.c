@@ -58,8 +58,8 @@ msh_ply_desc_t face_desc = { .element_name = "face",
                              .list_type = MSH_PLY_UINT8,
                              .list_size_hint = 3 };
 
-void
-read_ply( const char* filename, TriMesh* mesh)
+bool
+read_ply( const char* filename, TriMesh* mesh, bool *is_binary )
 {
   vertex_desc.data       = &mesh->vertices;
   vertex_desc.data_count = &mesh->n_verts;
@@ -71,18 +71,26 @@ read_ply( const char* filename, TriMesh* mesh)
     msh_ply_add_descriptor( pf, &vertex_desc );
     msh_ply_add_descriptor( pf, &face_desc );
     msh_ply_read(pf);
+    *is_binary = (pf->format != MSH_PLY_ASCII);
+    msh_ply_close(pf);
+    return true;
   }
-  msh_ply_close(pf);
+  else
+  {
+    msh_ply_close(pf);
+    return false;
+  }
 }
 
 void
-write_ply( const char* filename, TriMesh* mesh )
+write_ply( const char* filename, TriMesh* mesh, bool is_binary )
 {
   vertex_desc.data       = &mesh->vertices;
   vertex_desc.data_count = &mesh->n_verts;
   face_desc.data         = &mesh->faces;
   face_desc.data_count   = &mesh->n_faces;
-  msh_ply_t* pf = msh_ply_open( filename, "wb");
+  const char* write_format = is_binary ? "wb" : "w";
+  msh_ply_t* pf = msh_ply_open( filename, write_format);
   if( pf )
   {
     msh_ply_add_descriptor( pf, &vertex_desc );
@@ -110,7 +118,6 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 
   if( !msh_ap_parse(&parser, argc, argv) )
   {
-    msh_ap_display_help( &parser );
     return 1;
   }
   return 0;
@@ -126,15 +133,15 @@ main( int argc, char** argv )
   int parse_err = parse_arguments( argc, argv, &opts );
   if( parse_err ) { return 1; }
 
-  // Update the descriptors to point to mesh data
+  bool is_binary = false;
   msh_cprintf( opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
-  read_ply( opts.input_filename, &mesh );
+  read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   double read_time = msh_time_diff_ms( t2, t1 );
 
   t1 = msh_time_now();
-  if( opts.output_filename ) { write_ply( opts.output_filename, &mesh ); }
+  if( opts.output_filename ) { write_ply( opts.output_filename, &mesh, is_binary ); }
   t2 = msh_time_now();
   double write_time = msh_time_diff_ms( t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );

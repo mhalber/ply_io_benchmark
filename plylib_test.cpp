@@ -97,7 +97,7 @@ struct LoadPly_FaceAux
 };
 
 void
-read_ply( const char* filename, TriMesh* mesh)
+read_ply( const char* filename, TriMesh* mesh, bool * is_binary )
 {
   using namespace vcg::ply;
   PlyFile pf;
@@ -108,6 +108,7 @@ read_ply( const char* filename, TriMesh* mesh)
   pf.AddToRead("face", "vertex_indices", T_INT, T_INT, offsetof(LoadPly_FaceAux,v), 1, 0, T_UCHAR, T_UCHAR, offsetof(LoadPly_FaceAux,size) );
   LoadPly_VertAux va;
   LoadPly_FaceAux fa;
+  *is_binary = ( pf.GetFormat() != F_ASCII );
   for(int i=0;i<int(pf.elements.size());i++)
   {
     int n = pf.ElemNumber(i);
@@ -151,12 +152,14 @@ read_ply( const char* filename, TriMesh* mesh)
     const char * hbin = "binary_little_endian";
     const char * hasc = "ascii";
     const char * h;
+    const char* open_format;
     bool multit = false;
 
-    if(binary) h=hbin;
-    else       h=hasc;
+    if(binary) { h=hbin; open_format="wb"; }
+    else       { h=hasc; open_format="w"; }
 
-    fpout = fopen(filename,"wb");
+    
+    fpout = fopen(filename,open_format);
     if(fpout==NULL)	{
         return 0;
     }
@@ -174,12 +177,13 @@ read_ply( const char* filename, TriMesh* mesh)
     fprintf(fpout,"property %s y\n", vttp);
     fprintf(fpout,"property %s z\n", vttp);
 
-    fprintf(fpout,"element face %d\n", "property list uchar int vertex_indices\n" ,mesh->n_faces );
+    fprintf(fpout,"element face %d\n", mesh->n_faces );
+    fprintf(fpout,"property list uchar int vertex_indices\n" );
 
     fprintf(fpout, "end_header\n"	);
 
     int j;
-    for( j = 0; j <= mesh->n_verts; j++)
+    for( j = 0; j < mesh->n_verts; j++)
     {
         if( binary )
         {
@@ -191,8 +195,7 @@ read_ply( const char* filename, TriMesh* mesh)
         }
         else 	// ***** ASCII *****
         {
-            fprintf(fpout,"%.*g %.*g %.*g " ,mesh->vertices[j].x, mesh->vertices[j].y, mesh->vertices[j].z);
-            fprintf(fpout,"\n");
+            fprintf(fpout, "%g %g %g\n" ,mesh->vertices[j].x, mesh->vertices[j].y, mesh->vertices[j].z);
         }
     }
 
@@ -200,7 +203,7 @@ read_ply( const char* filename, TriMesh* mesh)
 
     char c = 3;
     int vv[3];
-    for( j = 0; j <= mesh->n_faces; j++)
+    for( j = 0; j < mesh->n_faces; j++)
     {
         if(binary)
         {
@@ -213,8 +216,7 @@ read_ply( const char* filename, TriMesh* mesh)
         else	// ***** ASCII *****
         {
             fprintf(fpout,"%d " ,c);
-            fprintf(fpout,"%d %d %d", mesh->faces[j].i1, mesh->faces[j].i2, mesh->faces[j].i3);
-            fprintf(fpout,"\n");
+            fprintf(fpout,"%d %d %d \n", mesh->faces[j].i1, mesh->faces[j].i2, mesh->faces[j].i3);
         }
     }
     fclose(fpout);
@@ -222,9 +224,9 @@ read_ply( const char* filename, TriMesh* mesh)
 }
 
 void
-write_ply( const char* filename, const TriMesh* mesh )
+write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
 {
-  Save( mesh, filename, 1 );
+  Save( mesh, filename, is_binary );
 }
 
 int parse_arguments( int argc, char**argv, Opts* opts)
@@ -245,7 +247,6 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 
   if( !msh_ap_parse(&parser, argc, argv) )
   {
-    msh_ap_display_help( &parser );
     return 1;
   }
   return 0;
@@ -261,18 +262,20 @@ main( int argc, char** argv )
   int parse_err = parse_arguments( argc, argv, &opts );
   if( parse_err ) { return 1; }
 
+  bool is_binary = false;
+
   msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
-  read_ply( opts.input_filename, &mesh );
+  read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh );
+  write_ply( opts.output_filename, &mesh, is_binary );
   t2 = msh_time_now();
   float write_time = msh_time_diff_ms( t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", read_time );
+  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
                mesh.n_verts, mesh.n_faces );
   int test_idx = 1024;

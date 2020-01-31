@@ -1330,6 +1330,7 @@ public:
     getElement(faceName).addListProperty<IndType>("vertex_indices", intInds);
   }
 
+  DataFormat getDataFormat() { return this->inputDataFormat ; }
 
   /**
    * @brief Comments for the file. When writing, each entry will be written as a sequential comment line.

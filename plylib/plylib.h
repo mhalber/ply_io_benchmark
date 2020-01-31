@@ -301,6 +301,7 @@ public:
 	static const char * newtypenames[9];
 
   inline const char * GetHeader() const { return header.c_str(); }
+	inline int GetFormat() { return this->format; }
 protected:
 
 	GZFILE gzfp;

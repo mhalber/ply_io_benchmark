@@ -58,7 +58,7 @@ typedef struct triangle_mesh
 } TriMesh;
 
 void
-read_ply( const char* filename, TriMesh* mesh)
+read_ply( const char* filename, TriMesh* mesh, bool* is_binary )
 {
   using namespace tinyply;
   std::ifstream ss(filename, std::ios::binary);
@@ -71,6 +71,7 @@ read_ply( const char* filename, TriMesh* mesh)
 
   file.read(ss);
   {
+    *is_binary = file.is_binary_file();
     mesh->n_verts  = verts->count;
     mesh->n_faces  = faces->count;
     mesh->vertices = (Vec3f*)malloc( verts->buffer.size_bytes() );
@@ -81,18 +82,20 @@ read_ply( const char* filename, TriMesh* mesh)
 }
 
 void
-write_ply( const char* filename, const TriMesh* mesh )
+write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
 {
   using namespace tinyply;
   std::filebuf fb;
-  fb.open(filename, std::ios::out | std::ios::binary);
+  std::ios_base::openmode flags = std::ios::out;
+  if( is_binary ) { flags |= std::ios::binary; }
+  fb.open(filename, flags );
   std::ostream outstream(&fb);
   PlyFile cube_file;
   cube_file.add_properties_to_element("vertex", { "x", "y", "z" }, 
       Type::FLOAT32, mesh->n_verts, reinterpret_cast<uint8_t*>(mesh->vertices), Type::INVALID, 0);
   cube_file.add_properties_to_element("face", { "vertex_indices" },
         Type::UINT32, mesh->n_faces, reinterpret_cast<uint8_t*>((int*)&mesh->faces[0].i1), Type::UINT8, 3);
-  cube_file.write(outstream, true);
+  cube_file.write(outstream, is_binary);
   fb.close();
 }
 
@@ -128,14 +131,14 @@ main( int argc, char** argv )
 
   int parse_err = parse_arguments( argc, argv, &opts );
   if( parse_err ) { return 1; }
-
+  bool is_binary = false;
   msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
-  read_ply( opts.input_filename, &mesh );
+  read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh );
+  write_ply( opts.output_filename, &mesh, is_binary);
   t2 = msh_time_now();
   float write_time = msh_time_diff_ms( t2, t1 );
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );

@@ -69,8 +69,11 @@ PlyProperty face_props[] = {
   {"vertex_indices", Int32, Int32, offsetof(Face,vertex_indices), 1, Uint8, Uint8, offsetof(Face,count)},
 };
 
+PlyFile *in_ply;
+PlyFile *out_ply;
+
 void
-read_ply_file( const char* filename, TriMesh* mesh)
+read_ply_file( const char* filename, TriMesh* mesh, bool *is_binary )
 {
   int elem_count;
   char *elem_name;
@@ -79,7 +82,7 @@ read_ply_file( const char* filename, TriMesh* mesh)
 
   FILE *fp = fopen(filename, "rb");
   if (!fp) { return; }
-  PlyFile *in_ply = read_ply (fp );
+  in_ply = read_ply (fp );
   
   for( i = 0; i < in_ply->num_elem_types; i++) 
   {
@@ -111,56 +114,54 @@ read_ply_file( const char* filename, TriMesh* mesh)
       }
     }
   }
-
+  *is_binary = (in_ply->file_type != PLY_ASCII);
   close_ply (in_ply);
-  free_ply (in_ply);
 }
 
 void
-write_ply_file( char* filename, const TriMesh* mesh )
+write_ply_file( char* filename, const TriMesh* mesh, bool is_binary )
 {
   int i;
   int num_elem_types;
-  PlyFile *ply;
   FILE* output = NULL;
-  output = fopen( filename, "w" );
+  output = fopen( filename, "wb" );
   if( output ==NULL ) return;
+  int file_type = is_binary ? PLY_BINARY_LE: PLY_ASCII;
 
-  ply = write_ply( output, 2, elem_names, PLY_BINARY_LE );
+  out_ply = write_ply( output, 2, elem_names, file_type );
 /*
   Describe what properties go into the vertex elements.
 */
-  describe_element_ply( ply, "vertex", mesh->n_verts );
-  describe_property_ply( ply, &vert_props[0] );
-  describe_property_ply( ply, &vert_props[1] );
-  describe_property_ply( ply, &vert_props[2] );
+  describe_element_ply( out_ply, "vertex", mesh->n_verts );
+  describe_property_ply( out_ply, &vert_props[0] );
+  describe_property_ply( out_ply, &vert_props[1] );
+  describe_property_ply( out_ply, &vert_props[2] );
 
 /*
   Describe what properties go into the face elements.
 */
-  describe_element_ply( ply, "face", mesh->n_faces );
-  describe_property_ply( ply, &face_props[0] );
+  describe_element_ply( out_ply, "face", mesh->n_faces );
+  describe_property_ply( out_ply, &face_props[0] );
 
-  header_complete_ply( ply );
+  header_complete_ply( out_ply );
 /*
   Set up and write the vertex elements.
 */
-  put_element_setup_ply( ply, "vertex" );
+  put_element_setup_ply( out_ply, "vertex" );
   for (i = 0; i < mesh->n_verts; i++)
   {
-    put_element_ply( ply, (void *) &mesh->vertices[i] );
+    put_element_ply( out_ply, (void *) &mesh->vertices[i] );
   }
 /*
   Set up and write the face elements.
 */
-  put_element_setup_ply( ply, "face" );
+  put_element_setup_ply( out_ply, "face" );
   for (i = 0; i < mesh->n_faces; i++)
   {
-    put_element_ply( ply, (void *) &mesh->faces[i] );
+    put_element_ply( out_ply, (void *) &mesh->faces[i] );
   }
 
-  close_ply( ply );
-  free_ply( ply );
+  close_ply( out_ply );
   fclose(output);
 }
 
@@ -200,13 +201,15 @@ main( int argc, char** argv )
   int parse_err = parse_arguments( argc, argv, &opts );
   if( parse_err ) { return 1; }
 
+  bool is_binary = false;
+
   msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
-  read_ply_file( opts.input_filename, &mesh );
+  read_ply_file( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
-  write_ply_file( opts.output_filename, &mesh );
+  write_ply_file( opts.output_filename, &mesh, is_binary );
   t2 = msh_time_now();
   float write_time = msh_time_diff_ms( t2, t1 );
 
@@ -226,6 +229,7 @@ main( int argc, char** argv )
                               mesh.faces[test_idx].vertex_indices[0],
                               mesh.faces[test_idx].vertex_indices[1],
                               mesh.faces[test_idx].vertex_indices[2] );
-
+  free_ply( out_ply );
+  free_ply( in_ply );
   return 0;
 }

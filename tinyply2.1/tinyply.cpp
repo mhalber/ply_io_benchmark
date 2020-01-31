@@ -638,6 +638,7 @@ void PlyFile::PlyFileImpl::parse_data(std::istream & is, bool firstPass)
 
 PlyFile::PlyFile() { impl.reset(new PlyFileImpl()); };
 PlyFile::~PlyFile() { };
+bool PlyFile::is_binary_file() const { return impl->isBinary; }
 bool PlyFile::parse_header(std::istream & is) { return impl->parse_header(is); }
 void PlyFile::read(std::istream & is, uint32_t fixed_list_size) { return impl->read(is, fixed_list_size); }
 void PlyFile::write(std::ostream & os, bool isBinary) { return impl->write(os, isBinary); }

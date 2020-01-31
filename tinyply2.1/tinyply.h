@@ -126,7 +126,8 @@ namespace tinyply
          * `add_properties_to_element` is well-formed. 
          */
         void write(std::ostream & os, bool isBinary);
-
+        bool is_binary_file() const;
+        
         std::vector<PlyElement> get_elements() const;
         std::vector<std::string> get_info() const;
         std::vector<std::string> & get_comments();

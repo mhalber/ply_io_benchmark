@@ -348,6 +348,14 @@ int ply_write(p_ply ply, double value);
  * ---------------------------------------------------------------------- */
 int ply_close(p_ply ply);
 
+
+/* ----------------------------------------------------------------------
+ * Returns storage mode of given ply file
+ *
+ * ply: handle to open file
+ * ---------------------------------------------------------------------- */
+e_ply_storage_mode ply_get_storage_mode(p_ply ply);
+
 #ifdef __cplusplus
 }
 #endif

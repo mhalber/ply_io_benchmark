@@ -50,7 +50,7 @@ typedef struct triangle_mesh
 } TriMesh;
 
 void
-read_ply( const char* filename, TriMesh* mesh)
+read_ply( const char* filename, TriMesh* mesh, bool *is_binary )
 {
   happly::PLYData plyIn( filename, false );
   std::vector<float> x_pos   = plyIn.getElement("vertex").getProperty<float>("x");
@@ -70,10 +70,11 @@ read_ply( const char* filename, TriMesh* mesh)
   {
      mesh->faces[i] = (Tri){ face_ind[i][0], face_ind[i][1], face_ind[i][2] };
   }
+  *is_binary = (plyIn.getDataFormat() != happly::DataFormat::ASCII);
 }
 
 void
-write_ply( const char* filename, const TriMesh* mesh )
+write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
 {
   // Create an empty object
   happly::PLYData plyOut;
@@ -108,7 +109,9 @@ write_ply( const char* filename, const TriMesh* mesh )
   // Store
   plyOut.getElement("face").addListProperty<int>("vertex_indices", intInds);
 
-  plyOut.write(filename, happly::DataFormat::Binary);
+  happly::DataFormat output_format = is_binary ? happly::DataFormat::Binary : happly::DataFormat::ASCII;
+
+  plyOut.write(filename, output_format );
 }
 
 int parse_arguments( int argc, char**argv, Opts* opts)
@@ -129,7 +132,6 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 
   if( !msh_ap_parse(&parser, argc, argv) )
   {
-    msh_ap_display_help( &parser );
     return 1;
   }
   return 0;
@@ -145,13 +147,15 @@ main( int argc, char** argv )
   int parse_err = parse_arguments( argc, argv, &opts );
   if( parse_err ) { return 1; }
 
+  bool is_binary = false;
+
   msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
-  read_ply( opts.input_filename, &mesh );
+  read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   float read_time = msh_time_diff_ms( t2, t1 );
   t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh );
+  write_ply( opts.output_filename, &mesh, is_binary );
   t2 = msh_time_now();
   float write_time = msh_time_diff_ms( t2, t1 );
   

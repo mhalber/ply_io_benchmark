@@ -138,8 +138,6 @@ def compute_results(results_folder, table_name):
     method_set.add( method_name )
     model_set.add( model_name )
 
-  print (model_set)
-
   # sort the methods and setup variables to store all results
   method_names = sorted(list(method_set))
   model_names = sorted(list(model_set))
@@ -178,7 +176,7 @@ def compute_results(results_folder, table_name):
     read_times_filename = results_folder + table_name + "_read.png"
     save_results_table( model_names, method_names, all_read_times, read_times_filename )
   
-  method_names.remove( "miniply" )
+  method_names.remove("miniply")
 
   print_average_table( model_names, method_names, all_write_times )
   print("")
@@ -187,7 +185,7 @@ def compute_results(results_folder, table_name):
   
   if table_name:
     write_times_filename = results_folder + table_name + "_write.png"
-    save_results_table( model_names, method_names, all_read_times, read_times_filename )
+    save_results_table( model_names, method_names, all_write_times, write_times_filename )
 
 def parse_arguments():
   parser = argparse.ArgumentParser(description='Run benchmarks')

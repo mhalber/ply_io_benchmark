@@ -134,6 +134,8 @@ Notes:
 | ASCII | [Read Times Table](assets/ascii_read_times.md) | [Read Times Image](assets/ascii_read.png) | [Write Times Table](assets/ascii_write_times.md) | [Write Times Image](assets/ascii_write.png) |
 | Binary | [Read Times Table](assets/little_endian_read_times.md) | [Read Times Image](assets/little_endian_read.png) | [Write Times Table](assets/little_endian_write_times.md) | [Write Times Image](assets/little_endian_write.png) |
 
+Note that the images show the read time on a log scale, since the performance of different libraries is significantly different.
+
 ## LOC
 
 Another metric we can use for deciding a library is the ease of use. Why LOC is by no means a perfect metric to measure ease of use, it does reflect how much code one needs to

@@ -44,7 +44,6 @@ typedef struct triangle_mesh
   Tri* faces;
 } TriMesh;
 
-
 const char* positions_names[] = { "x", "y", "z" };
 const char* vertex_indices_names[] = { "vertex_indices" };
 msh_ply_desc_t vertex_desc = { .element_name = "vertex",
@@ -70,14 +69,14 @@ read_ply( const char* filename, TriMesh* mesh, bool *is_binary )
   {
     msh_ply_add_descriptor( pf, &vertex_desc );
     msh_ply_add_descriptor( pf, &face_desc );
-    msh_ply_read(pf);
+    msh_ply_read( pf );
     *is_binary = (pf->format != MSH_PLY_ASCII);
-    msh_ply_close(pf);
+    msh_ply_close( pf );
     return true;
   }
   else
   {
-    msh_ply_close(pf);
+    msh_ply_close( pf );
     return false;
   }
 }
@@ -104,7 +103,7 @@ int parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = "test.ply";
+  opts->output_filename = NULL;
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "mshply test",
@@ -139,27 +138,19 @@ main( int argc, char** argv )
   read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
   double read_time = msh_time_diff_ms( t2, t1 );
-
-  t1 = msh_time_now();
-  if( opts.output_filename ) { write_ply( opts.output_filename, &mesh, is_binary ); }
-  t2 = msh_time_now();
-  double write_time = msh_time_diff_ms( t2, t1 );
+  double write_time = -1.0f;
+  if( opts.output_filename )
+  {
+    t1 = msh_time_now();
+    write_ply( opts.output_filename, &mesh, is_binary ); 
+    t2 = msh_time_now();
+    write_time = msh_time_diff_ms( t2, t1 );
+  }
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose && opts.output_filename, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d\n", mesh.n_verts, mesh.n_faces );
 
-  int test_idx = 1024;
-  msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
-                              test_idx, 
-                              mesh.vertices[test_idx].x,
-                              mesh.vertices[test_idx].y,
-                              mesh.vertices[test_idx].z );
-  msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
-                              test_idx, 
-                              mesh.faces[test_idx].i1,
-                              mesh.faces[test_idx].i2,
-                              mesh.faces[test_idx].i3 );
 
   return 0;
 }

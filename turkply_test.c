@@ -216,19 +216,7 @@ main( int argc, char** argv )
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d;N. Faces: %d \n", 
-               mesh.n_verts, mesh.n_faces );
-  int test_idx = 1024;
-  msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
-                              test_idx, 
-                              mesh.vertices[test_idx].x,
-                              mesh.vertices[test_idx].y,
-                              mesh.vertices[test_idx].z );
-  msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
-                              test_idx, 
-                              mesh.faces[test_idx].vertex_indices[0],
-                              mesh.faces[test_idx].vertex_indices[1],
-                              mesh.faces[test_idx].vertex_indices[2] );
+  msh_cprintf( opts.verbose, "N. Verts : %d;N. Faces: %d \n",  mesh.n_verts, mesh.n_faces );
   free_ply( out_ply );
   free_ply( in_ply );
   return 0;

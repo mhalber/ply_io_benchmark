@@ -90,12 +90,12 @@ write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
   if( is_binary ) { flags |= std::ios::binary; }
   fb.open(filename, flags );
   std::ostream outstream(&fb);
-  PlyFile cube_file;
-  cube_file.add_properties_to_element("vertex", { "x", "y", "z" }, 
+  PlyFile out_file;
+  out_file.add_properties_to_element("vertex", { "x", "y", "z" }, 
       Type::FLOAT32, mesh->n_verts, reinterpret_cast<uint8_t*>(mesh->vertices), Type::INVALID, 0);
-  cube_file.add_properties_to_element("face", { "vertex_indices" },
+  out_file.add_properties_to_element("face", { "vertex_indices" },
         Type::UINT32, mesh->n_faces, reinterpret_cast<uint8_t*>((int*)&mesh->faces[0].i1), Type::UINT8, 3);
-  cube_file.write(outstream, is_binary);
+  out_file.write(outstream, is_binary);
   fb.close();
 }
 
@@ -144,19 +144,7 @@ main( int argc, char** argv )
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d \n", 
-               mesh.n_verts, mesh.n_faces );
-  int test_idx = 1024;
-  msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
-                              test_idx, 
-                              mesh.vertices[test_idx].x,
-                              mesh.vertices[test_idx].y,
-                              mesh.vertices[test_idx].z );
-  msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
-                              test_idx, 
-                              mesh.faces[test_idx].i1,
-                              mesh.faces[test_idx].i2,
-                              mesh.faces[test_idx].i3 );
+  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d \n", mesh.n_verts, mesh.n_faces );
 
   return 0;
 }

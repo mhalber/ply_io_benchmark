@@ -75,7 +75,7 @@ Below is a list of libraries used in this benchmark:
 | [happly](https://github.com/nmwsharp/happly) | [Nicolas Sharp](https://github.com/nmwsharp) | c++ |  :x: |
 | [miniply](https://github.com/vilya/miniply) |  [Vilya Harper](https://github.com/vilya  ) | c++ | :heavy_check_mark: |
 | [nanoply](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/nanoply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib) | c++ | :x: |
-| [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib)  | c++ |  :x: | (PLY reading/writing used by Meshlab(?)
+| [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib)  | c++ |  :x: | PLY reading/writing used by Meshlab(?)
 | [tinyply](https://github.com/ddiakopoulos/tinyply) | [Dimitri Diakopoulos](https://github.com/ddiakopoulos) | c++ |  :heavy_check_mark: | This benchmark includes versions 2.1, 2.2 and 2.3 of this library. 
 
 For the usage examples, as well as some additional comments about each of the libraries please check the *_test.c(pp) files.
@@ -89,7 +89,7 @@ The benchmark was compiled using gcc 8.3, with -O3 level of optimization.
 
 To run the test, we run a separate program for each file that attempts to read and write each of the models, and reports time taken to do so. Program for each method is run 10 times and results are averaged. Then we use these averaged results to compute the total average times below.
 
-*Disclaimer: I am the author of msh_ply library. If you see any deficiencies in code for other libraries, don't hesitate to let me know - I hope to make this benchmark as fair as possible.*
+* Disclaimer: I am the author of msh_ply library. If you see any deficiencies in code for other libraries, don't hesitate to let me know - I hope to make this benchmark as fair as possible. *
 
 ### Average Read Times
 
@@ -125,9 +125,9 @@ Notes:
  - miniply is almost an order of magnitude faster than alternatives for ASCII files while remaining competitive for binary task
  - miniply does not support the writing of ply files.
  - some libraries were modified to include getter to establish whether input is binary or ASCII.
- - In binary mode, happly is unable to convert between __uint__ and __int__. Since some models (bust_of_sappho,bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others as __int__, happly fails to parse all the models and would need to be recompiled to support the specific type.
-### Per model read times:
-
+ - In binary mode, happly is unable to convert between __uint__ and __int__. Since some models (bust_of_sappho,bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse all the models and would need to be recompiled to support the specific type.
+ 
+ ### Per model I/O times:
 
 |  |  |  |  |  |
 |-:|--|--|--|--|
@@ -151,4 +151,4 @@ type to get basic PLY I/O done. Also, note that these numbers report only simple
 | turkply   |    52       |   39      |
 
 [Large Geometric Models Archvive]: https://www.cc.gatech.edu/projects/large_models/index.html
-[Stanford 3D Scaning Repository]: (http://graphics.stanford.edu/data/3Dscanrep/)
+[Stanford 3D Scaning Repository]: http://graphics.stanford.edu/data/3Dscanrep/

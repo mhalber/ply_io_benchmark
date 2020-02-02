@@ -125,7 +125,7 @@ Notes:
  - miniply is almost an order of magnitude faster than alternatives for ASCII files while remaining competitive for binary task
  - miniply does not support the writing of ply files.
  - some libraries were modified to include getter to establish whether input is binary or ASCII.
- - In binary mode, happly is unable to convert between __uint__ and __int__. Since some models (bust_of_sappho,bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse all the models and would need to be recompiled to support the specific type.
+ - In binary mode, happly is unable to convert between __uint__ and __int__. Since some models (bust_of_sappho,bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse the two aforementioned models and would need to be recompiled to support the specific type.
  
  ### Per model I/O times:
 

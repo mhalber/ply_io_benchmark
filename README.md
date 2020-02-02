@@ -146,7 +146,7 @@ type to get basic PLY I/O done. Also, note that these numbers report only simple
 | miniply   |    35       |  N/A      |
 | mshply    |    29       |   23      |
 | nanoply   |    23       |   29      |
-| plylib    |    78       |   65*     |
+| plylib    |    78       |   65      |
 | rply      |    69       |   23      |
 | happly    |  **17**     |   26      |
 | tinyply   |  **17**     | **10**    |

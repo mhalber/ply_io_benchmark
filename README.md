@@ -73,7 +73,7 @@ Below is a list of libraries used in this benchmark:
 | [rply](http://w3.impa.br/~diego/software/rply/) | [Diego Nehab](http://w3.impa.br/~diego/index.html) | c | :x: | 
 | [msh_ply](https://github.com/mhalber/msh) | [Maciej Halber](https://github.com/mhalber) | c | :heavy_check_mark: |
 | [happly](https://github.com/nmwsharp/happly) | [Nicolas Sharp](https://github.com/nmwsharp) | c++ |  :x: |
-| [miniply](https://github.com/vilya/miniply) |  [Vilya Harper](https://github.com/vilya  ) | c++ | :heavy_check_mark: |
+| [miniply](https://github.com/vilya/miniply) |  [Vilya Harvey](https://github.com/vilya) | c++ | :heavy_check_mark: |
 | [nanoply](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/nanoply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib) | c++ | :x: |
 | [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib)  | c++ |  :x: | PLY reading/writing used by Meshlab(?)
 | [tinyply](https://github.com/ddiakopoulos/tinyply) | [Dimitri Diakopoulos](https://github.com/ddiakopoulos) | c++ |  :heavy_check_mark: | This benchmark includes versions 2.1, 2.2 and 2.3 of this library. 

@@ -1,8 +1,7 @@
 /*
 Author: Maciej Halber
-Data: 04/09/18
-Description: Benchmarking the read and write capabilities of turkply, a ply file
-reader found on jburkardt's site. It lists greg turk as an author.
+Date: 04/09/18
+Description: Benchmarking the read and write capabilities of turkply, which is the original code for ply file parsing by Greg Turk, with name changed to differentiate it from other lubraries..
 Setting is simple - getting positions and vertex_indices from a ply file that describes
 triangular mesh.
 License: Public Domain
@@ -11,13 +10,9 @@ Compilation:
 gcc -I<path_to_msh> -Iturkply/ -O2 -std=c11 turkply/ply_io.c turkply_test.c -o bin/turkply_test
 
 Notes:
-- turk's ply annoingly has function called conflicted with my functions.
-- turk's ply does not deal with the endianness correctly
-- turk's ply used drand48() which is posix function, not available on Windows.
+- turkply's does not deal with the endianness correctly
+- turkply's used drand48() which is posix function, not available on Windows.
   Replaced it with (float)rand()/(float)(RAND_MAX)
-- Seems to have issues writing binary files?
-
-NOTE: The examples are based on Greg Turk code from 94
 */
 
 #define MSH_STD_INCLUDE_LIBC_HEADERS

@@ -1,12 +1,12 @@
 /*
 Author: Maciej Halber
-Data: 04/09/18
+Date: 04/09/18
 Description: Benchmarking the read and write capabilities of plylib by @cnr-isti-vclab
 I use ply file io code found in: https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply
 which I believe to be used in meshlab. Can someone confirm or deny?
 Example adapred from: https://github.com/cnr-isti-vclab/vcglib/blob/master/wrap/io_trimesh/import_ply.h
-Setting is simple - getting positions and vertex_indices from a ply file that describes
-triangular mesh.
+Task is to get positions and vertex_indices from a ply file that describe
+triangular mesh and write that mesh back to hard drive.
 License: Public Domain
 
 Compilation:

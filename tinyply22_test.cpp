@@ -1,16 +1,14 @@
 /*
 Author: Maciej Halber
-Data: 08/12/18
+Date: 08/12/18
 Description: Benchmarking the read and write capabilities of tinyply by @ddiakopoulos
-Setting is simple - getting positions and vertex_indices from a ply file that describes
-triangular mesh.
+Task is to get positions and vertex_indices from a ply file that describe
+triangular mesh and write that mesh back to hard drive.
 License: Public Domain
 
 Compilation:
 g++ -I<path_to_msh> -Itinyply/ -O2 -std=c++11 tinyply2_test.cpp -o bin/tinyply2_test
 
-Notes:
-- No way to do non-triangle meshes?
 */
 
 #define MSH_STD_INCLUDE_LIBC_HEADERS

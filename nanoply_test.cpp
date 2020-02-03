@@ -1,9 +1,9 @@
 /*
 Author: Maciej Halber
-Data: 04/09/18
-Description: Benchmarking the read and write capabilities of nanoply by @cnr-isti-vclab
-Setting is simple - getting positions and vertex_indices from a ply file that describes
-triangular mesh.
+Date: 04/09/18
+Description: Benchmarking the read and write capabilities of nanoply from vcglib @cnr-isti-vclab
+Task is to get positions and vertex_indices from a ply file that describe
+triangular mesh and write that mesh back to hard drive.
 License: Public Domain
 
 Compilation:

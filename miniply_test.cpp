@@ -1,9 +1,9 @@
 /*
 Author: Maciej Halber
-Data: 08/12/18
-Description: Benchmarking the read and write capabilities of tinyply by @ddiakopoulos
-Setting is simple - getting positions and vertex_indices from a ply file that describes
-triangular mesh.
+Date: 02/02/2020
+Description: Benchmarking the read and write capabilities of miniply by Vilya Harvey
+Task is to get positions and vertex_indices from a ply file that describe
+triangular mesh and write that mesh back
 License: Public Domain
 
 Compilation:
@@ -54,7 +54,7 @@ typedef struct triangle_mesh
 } TriMesh;
 
 
-// This is modified code from Vilya Harper's ply-parsing-perf
+// This is modified code from Vilya Harvey's ply-parsing-perf
 void
 read_ply( const char* filename, TriMesh* mesh)
 {

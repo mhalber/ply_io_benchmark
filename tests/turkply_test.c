@@ -10,9 +10,11 @@ Compilation:
 gcc -I<path_to_msh> -Iturkply/ -O2 -std=c11 turkply/ply_io.c turkply_test.c -o bin/turkply_test
 
 Notes:
-- turkply's does not deal with the endianness correctly
-- turkply's used drand48() which is posix function, not available on Windows.
+- turkply does not seem deal with the endianness correctly
+- turkply used drand48() which is posix function, not available on Windows.
   Replaced it with (float)rand()/(float)(RAND_MAX)
+- turkply forces a specific representation of the mesh's face, hence I cannot reuse base_test.h
+- turkply generates a lot of warnings on MSVC, I suppresed them, but the library should be ideally fixed.
 */
 
 #define MSH_STD_INCLUDE_LIBC_HEADERS
@@ -166,7 +168,7 @@ parse_arguments( int argc, char**argv, Opts* opts)
 {
   msh_argparse_t parser;
   opts->input_filename  = NULL;
-  opts->output_filename = "test.ply";
+  opts->output_filename = NULL;
   opts->verbose         = 0;
 
   msh_ap_init( &parser, "turkply test",
@@ -197,22 +199,29 @@ main( int argc, char** argv )
   if( parse_err ) { return 1; }
 
   bool is_binary = false;
-
-  msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
+  msh_cprintf( opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
   read_ply_file( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
-  float read_time = msh_time_diff_ms( t2, t1 );
-  t1 = msh_time_now();
-  write_ply_file( opts.output_filename, &mesh, is_binary );
-  t2 = msh_time_now();
-  float write_time = msh_time_diff_ms( t2, t1 );
+  double read_time = msh_time_diff_ms( t2, t1 );
 
+  double write_time = -1.0f;
+  if( opts.output_filename )
+  {
+    t1 = msh_time_now();
+    write_ply_file( opts.output_filename, &mesh, is_binary ); 
+    t2 = msh_time_now();
+    write_time = msh_time_diff_ms( t2, t1 );
+  }
+  
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
+
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d;N. Faces: %d \n",  mesh.n_verts, mesh.n_faces );
+  msh_cprintf( opts.verbose && opts.output_filename, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d\n", mesh.n_verts, mesh.n_faces );
+
   free_ply( out_ply );
   free_ply( in_ply );
+
   return 0;
 }

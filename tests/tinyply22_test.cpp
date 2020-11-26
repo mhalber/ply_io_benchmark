@@ -7,7 +7,7 @@ triangular mesh and write that mesh back to hard drive.
 License: Public Domain
 
 Compilation:
-g++ -I<path_to_msh> -Itinyply/ -O2 -std=c++11 tinyply2_test.cpp -o bin/tinyply2_test
+g++ -I<path_to_msh> -Itinyply/ -O2 -std=c++11 tinyply22_test.cpp -o bin/tinyply22_test
 
 */
 
@@ -26,36 +26,10 @@ g++ -I<path_to_msh> -Itinyply/ -O2 -std=c++11 tinyply2_test.cpp -o bin/tinyply2_
 #include <iostream>
 #include <cstring>
 #include <unordered_map>
-#include "tinyply.h"
+#include "tinyply22/tinyply.h"
+#include "base_test.h"
 
-
-
-typedef struct options
-{
-  bool verbose;
-  char* input_filename;
-  char* output_filename;
-} Opts;
-
-typedef struct vec3f
-{
-  float x,y,z;
-} Vec3f;
-
-typedef struct tri
-{
-  int i1, i2, i3;
-} Tri;
-
-typedef struct triangle_mesh
-{
-  int n_verts;
-  int n_faces;
-  Vec3f* vertices;
-  Tri* faces;
-} TriMesh;
-
-void
+bool
 read_ply( const char* filename, TriMesh* mesh, bool *is_binary)
 {
   using namespace tinyply;
@@ -70,17 +44,18 @@ read_ply( const char* filename, TriMesh* mesh, bool *is_binary)
   file.read(ss);
   {
     *is_binary = file.is_binary_file();
-    mesh->n_verts  = verts->count;
-    mesh->n_faces  = faces->count;
+    mesh->n_verts  = (int32_t)verts->count;
+    mesh->n_faces  = (int32_t)faces->count;
     mesh->vertices = (Vec3f*)malloc( verts->buffer.size_bytes() );
     mesh->faces    = (Tri*)malloc( faces->buffer.size_bytes() );
     std::memcpy(mesh->vertices, verts->buffer.get(), verts->buffer.size_bytes() );
     std::memcpy(mesh->faces, faces->buffer.get(), faces->buffer.size_bytes() );
   }
+  return true;
 }
 
 void
-write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
+write_ply( const char* filename, TriMesh* mesh, bool is_binary )
 {
   using namespace tinyply;
   std::filebuf fb;
@@ -97,54 +72,9 @@ write_ply( const char* filename, const TriMesh* mesh, bool is_binary )
   fb.close();
 }
 
-int parse_arguments( int argc, char**argv, Opts* opts)
-{
-  msh_argparse_t parser;
-  opts->input_filename  = NULL;
-  opts->output_filename = (char*)"test.ply";
-  opts->verbose         = 0;
-
-  msh_ap_init( &parser, "tinyply22 test",
-               "This program simply reads and writes an input ply file" );
-  msh_ap_add_string_argument( &parser, "input_filename", NULL, "Name of a ply file to read",
-                           &opts->input_filename, 1 );
-  msh_ap_add_string_argument( &parser, "--output_filename", "-o", "Name of a ply file to write",
-                          &opts->output_filename, 1 );
-  msh_ap_add_bool_argument( &parser, "--verbose", "-v", "Print verbose information",
-                        &opts->verbose, 0 );
-
-  if( !msh_ap_parse(&parser, argc, argv) )
-  {
-    return 1;
-  }
-  return 0;
-}
-
 int
 main( int argc, char** argv )
 {
-  uint64_t t1, t2;
-  Opts opts = {0};
-  TriMesh mesh = {0};
-
-  int parse_err = parse_arguments( argc, argv, &opts );
-  if( parse_err ) { return 1; }
-
-  bool is_binary = false;
-
-  msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
-  t1 = msh_time_now();
-  read_ply( opts.input_filename, &mesh, &is_binary );
-  t2 = msh_time_now();
-  float read_time = msh_time_diff_ms( t2, t1 );
-  t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh, is_binary );
-  t2 = msh_time_now();
-  float write_time = msh_time_diff_ms( t2, t1 );
-  msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
-  msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d \n",  mesh.n_verts, mesh.n_faces );
-
-  return 0;
+  bool is_able_to_write_ply = true;
+  return run_test("tinyply22_test", is_able_to_write_ply, argc, argv );
 }

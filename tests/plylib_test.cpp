@@ -148,7 +148,6 @@ read_ply( const char* filename, TriMesh* mesh, bool * is_binary )
  static int Save( const TriMesh* mesh, const char * filename, bool binary )	// V1.0
 {
     FILE * fpout;
-    int i;
     const char * hbin = "binary_little_endian";
     const char * hasc = "ascii";
     const char * h;
@@ -263,32 +262,23 @@ main( int argc, char** argv )
   if( parse_err ) { return 1; }
 
   bool is_binary = false;
-
-  msh_cprintf(opts.verbose, "Reading %s ...\n", opts.input_filename );
+  msh_cprintf( opts.verbose, "Reading %s ...\n", opts.input_filename );
   t1 = msh_time_now();
   read_ply( opts.input_filename, &mesh, &is_binary );
   t2 = msh_time_now();
-  float read_time = msh_time_diff_ms( t2, t1 );
-  t1 = msh_time_now();
-  write_ply( opts.output_filename, &mesh, is_binary );
-  t2 = msh_time_now();
-  float write_time = msh_time_diff_ms( t2, t1 );
+  double read_time = msh_time_diff_ms( t2, t1 );
+  double write_time = -1.0f;
+  if( opts.output_filename )
+  {
+    t1 = msh_time_now();
+    write_ply( opts.output_filename, &mesh, is_binary ); 
+    t2 = msh_time_now();
+    write_time = msh_time_diff_ms( t2, t1 );
+  }
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
   msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
-  msh_cprintf( opts.verbose, "Writing done in %lf ms\n", write_time );
-  msh_cprintf( opts.verbose, "N. Verts : %d ;N. Faces: %d \n", 
-               mesh.n_verts, mesh.n_faces );
-  int test_idx = 1024;
-  msh_cprintf( opts.verbose, "Vert no. %d : %f %f %f\n",
-                              test_idx, 
-                              mesh.vertices[test_idx].x,
-                              mesh.vertices[test_idx].y,
-                              mesh.vertices[test_idx].z );
-  msh_cprintf( opts.verbose, "Face no. %d : %d %d %d\n", 
-                              test_idx, 
-                              mesh.faces[test_idx].i1,
-                              mesh.faces[test_idx].i2,
-                              mesh.faces[test_idx].i3 );
+  msh_cprintf( opts.verbose && opts.output_filename, "Writing done in %lf ms\n", write_time );
+  msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d\n", mesh.n_verts, mesh.n_faces );
 
   return 0;
 }

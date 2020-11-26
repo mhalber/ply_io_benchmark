@@ -1,4 +1,4 @@
-# A trivial makefile for producing the binaries to run the benchmarks
+# A simple makefile for compiling the binaries to run the benchmarks
 
 CC=gcc
 CPP=g++
@@ -13,8 +13,8 @@ all:
 	$(CC)  -I$(MSH_DIR) $(CFLAGS)  mshply_test.c -o bin/mshply_test
 	$(CPP) -I$(MSH_DIR) -Inanoply/ $(CPPFLAGS) nanoply_test.cpp -o bin/nanoply_test
 	$(CPP) -I$(MSH_DIR) -Ihapply/ $(CPPFLAGS) happly_test.cpp -o bin/happly_test
-	$(CPP) -I$(MSH_DIR) -Itinyply2.1/ $(CPPFLAGS) tinyply2.1/tinyply.cpp tinyply21_test.cpp -o bin/tinyply21_test
-	$(CPP) -I$(MSH_DIR) -Itinyply2.2/ $(CPPFLAGS) tinyply22_test.cpp -o bin/tinyply22_test
-	$(CPP) -I$(MSH_DIR) -Itinyply2.3/ $(CPPFLAGS) tinyply23_test.cpp -o bin/tinyply23_test
+	$(CPP) -I$(MSH_DIR) -Itinyply21/ $(CPPFLAGS) tinyply21/tinyply.cpp tinyply21_test.cpp -o bin/tinyply21_test
+	$(CPP) -I$(MSH_DIR) -Itinyply22/ $(CPPFLAGS) tinyply22_test.cpp -o bin/tinyply22_test
+	$(CPP) -I$(MSH_DIR) -Itinyply23/ $(CPPFLAGS) tinyply23_test.cpp -o bin/tinyply23_test
 	$(CPP) -I$(MSH_DIR) -Iplylib/ $(CPPFLAGS) plylib/plylib.cpp plylib_test.cpp -o bin/plylib_test
 	$(CPP) -I$(MSH_DIR) -Iminiply/ $(CPPFLAGS) miniply/miniply.cpp miniply_test.cpp -o bin/miniply_test

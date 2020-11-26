@@ -2,8 +2,8 @@
 Author: Maciej Halber
 Date: 04/09/18
 Description: Benchmarking the read and write capabilities of rply by Diego Nehab
-Setting is simple - getting positions and vertex_indices from a ply file that describes
-triangular mesh.
+Task is to get positions and vertex_indices from a ply file that describe
+triangular mesh and write that mesh back to hard drive.
 License: Public Domain
 
 Compilation:

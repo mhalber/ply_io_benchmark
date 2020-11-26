@@ -1,13 +1,14 @@
 /*
 Author: Maciej Halber
-Data: 04/09/18
-Description: 
+Date: 04/09/18
+Description: Benchmarking the read and write capabilities of happly by Nicolas Sharp
+Task is to get positions and vertex_indices from a ply file that describe
+triangular mesh and write that mesh back to hard drive.
 License: Public Domain
 
 Compilation:
 g++ -I<path_to_msh> -Ihapply/ -O2 -std=c++11 happly_test.cpp -o bin/happly_test
 
-Notes:
 */
 #include <thread>
 #include <vector>

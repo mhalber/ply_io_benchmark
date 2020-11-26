@@ -1,16 +1,16 @@
 /*
 Author: Maciej Halber
 Date: 02/02/2020
-Description: Benchmarking the read and write capabilities of miniply by Vilya Harvey
+Description: Benchmarking the read and write capabilities of miniply by Vilya Harvey (@vilyah)
 Task is to get positions and vertex_indices from a ply file that describe
-triangular mesh and write that mesh back
+triangular mesh and write that mesh back to hard drive.
 License: Public Domain
 
 Compilation:
 g++ -I<path_to_msh> -Iminiply/ -O2 -std=c++11 miniply/miniply.cpp miniply_test.cpp -o bin/miniply_test
 
 Notes:
-- No way to do non-triangle meshes?
+- miniply is super fast in general, but it especially excels in parsing ascii files.
 */
 
 #define MSH_STD_INCLUDE_LIBC_HEADERS

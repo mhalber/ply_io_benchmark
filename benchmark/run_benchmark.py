@@ -7,8 +7,9 @@ from os.path import isfile, join
 
 
 def run_benchmark(args):
-  models_names = [path.join(args.model_folder, f) for f in listdir( args.model_folder ) if isfile(join(args.model_folder, f))]
-  binaries_names = [path.join(args.binary_folder, b) for b in listdir( args.binary_folder ) if isfile(join(args.binary_folder, b)) ]
+  models_names = [path.join(args.model_folder, f) for f in listdir( args.model_folder ) if isfile(join(args.model_folder, f)) ]
+  binaries_names = [path.join(args.binary_folder, b) for b in listdir( args.binary_folder ) if isfile(join(args.binary_folder, b)) and path.splitext(b)[1] == ".exe" ]
+
   n_tests = len(binaries_names) * len(models_names)
   cur_test = 0
   for binary_name in binaries_names:

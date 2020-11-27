@@ -7,7 +7,7 @@ import argparse
 def run_test( binary_name, model_name, n_tries, results_folder ):
     binary_base_name = path.splitext( path.basename( binary_name ) )[0]
     model_base_name = path.splitext( path.basename( model_name ) )[0]
-    result_filename = results_folder + binary_base_name + "_" + model_base_name + ".txt"
+    result_filename = path.join(results_folder, binary_base_name + "_" + model_base_name + ".txt")
 
     result_file = open(result_filename, "w")
     

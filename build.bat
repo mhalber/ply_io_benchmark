@@ -20,7 +20,7 @@ cl %opts_cpp% %include_dirs% %tests_dir%\tinyply23_test.cpp -Fe"tinyply23_test.e
 
 cl %opts_cpp% %include_dirs% -I%lib_dir%\miniply %lib_dir%\miniply\miniply.cpp %tests_dir%\miniply_test.cpp -Fe"miniply_test.exe"
 cl %opts_cpp% %include_dirs% -I%lib_dir%\plylib %lib_dir%\plylib\plylib.cpp %tests_dir%\plylib_test.cpp -Fe"plylib_test.exe"
-cl %opts_cpp% %include_dirs% -I%lib_dir%\tinyply21 %lib_dir%\tinyply21\tinyply.cpp %tests_dir%\tinyply21_test.cpp -Fe"plylib21_test.exe"
+cl %opts_cpp% %include_dirs% -I%lib_dir%\tinyply21 %lib_dir%\tinyply21\tinyply.cpp %tests_dir%\tinyply21_test.cpp -Fe"tinyply21_test.exe"
 
 cl %opts_c% -wd4267 -wd4244 -wd4101 -wd4996 %include_dirs% -I%lib_dir%\turkply %lib_dir%\turkply\ply_io.c %tests_dir%\turkply_test.c -Fe"turkply_test.exe"
 cl %opts_c% %include_dirs% -I%lib_dir%\rply %lib_dir%\rply\rply.c %tests_dir%\rply_test.c -Fe"rply_test.exe"

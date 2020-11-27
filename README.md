@@ -127,9 +127,10 @@ The averaged time taken for each model is used to compute the overall average ti
 **Notes**:
  - miniply is the fastest library for reading the ply files. If you're only interested in reading files and use C++, it is a great choice.
  - miniply and microply do not support the writing of ply files.
+ - In c, when you need decent read and write performance, msh_ply is a good choice ;). However, it's ASCII mode requires work, so if your models are mostly stored in ASCII, you might want to use other libraries.
  - microply cannot parse binary files, it only supports ASCII formats.
  - Some libraries were modified to include getter to establish whether input is binary or ASCII.
- - In binary mode, happly is unable to convert between __uint__ and __int__. Since some models (bust_of_sappho,bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse the two aforementioned models and would need to be recompiled to support the specific type.
+ - In ASCII mode, happly is unable to convert between __uint__ and __int__. Since some models (angel, bust_of_sappho, bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse the two aforementioned models and would need to be recompiled to support the specific type. Here, we simply omit these models when benchmarking happly.
  
  ### Per model I/O times:
 

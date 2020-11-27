@@ -135,7 +135,7 @@ The averaged time taken for each model is used to compute the overall average ti
 
 |  |  |  |  |  |
 |-:|--|--|--|--|
-| ASCII | [Read Times Table](assets/ascii_read_full_table.md) | [Read Times Image](assets/ascii_read._figpng) | [Write Times Table](assets/ascii_write_full_table.md) | [Write Times Image](assets/ascii_write._figpng) |
+| ASCII | [Read Times Table](assets/ascii_read_full_table.md) | [Read Times Image](assets/ascii_read_fig.png) | [Write Times Table](assets/ascii_write_full_table.md) | [Write Times Image](assets/ascii_write_fig.png) |
 | Binary | [Read Times Table](assets/binary_read_full_table.md) | [Read Times Image](assets/binary_read_fig.png) | [Write Times Table](assets/binary_write_full_table.md) | [Write Times Image](assets/binary_write_fig.png) |
 
 Note that the images show the read time on a log scale, since the performance of different libraries is significantly different.

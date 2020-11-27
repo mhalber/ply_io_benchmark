@@ -74,7 +74,7 @@ Below is a list of libraries used in this benchmark:
 | [msh_ply](https://github.com/mhalber/msh) | [Maciej Halber](https://github.com/mhalber) | c | :heavy_check_mark: |
 | [happly](https://github.com/nmwsharp/happly) | [Nicolas Sharp](https://github.com/nmwsharp) | c++ |  :x: |
 | [miniply](https://github.com/vilya/miniply) |  [Vilya Harvey](https://github.com/vilya) | c++ | :heavy_check_mark: | Only supports reading PLY files|
-| [microply](https://github.com/maluoi/header-libs) | [Nick Klingensmith](https://github.com/maluoi)   | c++ | :x: | Only supports reading ASCII PLY files  | 
+| [micro_ply](https://github.com/maluoi/header-libs) | [Nick Klingensmith](https://github.com/maluoi)   | c++ | :x: | Only supports reading ASCII PLY files  | 
 | [nanoply](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/nanoply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib) | c++ | :x: |
 | [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib)  | c++ |  :x: | PLY reading/writing used by Meshlab(?)
 | [tinyply](https://github.com/ddiakopoulos/tinyply) | [Dimitri Diakopoulos](https://github.com/ddiakopoulos) | c++ |  :heavy_check_mark: | This benchmark includes versions 2.1, 2.2 and 2.3 of this library. 
@@ -98,9 +98,9 @@ The averaged time taken for each model is used to compute the overall average ti
 |Method     | ASCII             |           Binary   |
 -----------:|------------------:|-------------------:|
 |happly     |  19104.671(75.3x) |     589.435(16.4x) |
-|microply   |    1131.752(4.5x) |              N/A   |
+|micro_ply  |    1131.752(4.5x) |              N/A   |
 |miniply    | **253.671(1.0x)** |   **35.935(1.0x)** |
-|mshply     |    2009.957(7.9x) |       40.885(1.1x) |
+|msh_ply    |    2009.957(7.9x) |       40.885(1.1x) |
 |nanoply    |   8003.712(31.6x) |      106.312(3.0x) |
 |plylib     |   3157.350(12.4x) |      338.514(9.4x) |
 |rply       |    1731.580(6.8x) |      327.164(9.1x) |
@@ -115,7 +115,7 @@ The averaged time taken for each model is used to compute the overall average ti
 |Method      |           ASCII    |            Binary  |
 |-----------:|-------------------:|-------------------:|
 |happly      |    11534.080(3.8x) |    1454.963(19.8x) |
-|mshply      |     4178.405(1.4x) |   **73.406(1.0x)** |
+|msh_ply     |     4178.405(1.4x) |   **73.406(1.0x)** |
 |nanoply     |     8772.179(2.9x) |      107.735(1.5x) |
 |plylib      | **3045.147(1.0x)** |      315.647(4.3x) |
 |rply        |     3966.512(1.3x) |      261.940(3.6x) |
@@ -126,9 +126,9 @@ The averaged time taken for each model is used to compute the overall average ti
 
 **Notes**:
  - miniply is the fastest library for reading the ply files. If you're only interested in reading files and use C++, it is a great choice.
- - miniply and microply do not support the writing of ply files.
- - In c, when you need decent read and write performance, msh_ply is a good choice ;). However, it's ASCII mode requires work, so if your models are mostly stored in ASCII, you might want to use other libraries.
- - microply cannot parse binary files, it only supports ASCII formats.
+ - miniply and micro_ply do not support the writing of ply files.
+ - micro_ply does not support binary files, only ASCII format.
+ - In C, when you need decent read and write performance, msh_ply is a good choice ;). However, it's ASCII mode requires work, so if your models are mostly stored in ASCII, you might want to use other libraries.
  - Some libraries were modified to include getter to establish whether input is binary or ASCII.
  - In ASCII mode, happly is unable to convert between __uint__ and __int__. Since some models (angel, bust_of_sappho, bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse the two aforementioned models and would need to be recompiled to support the specific type. Here, we simply omit these models when benchmarking happly.
  
@@ -149,8 +149,8 @@ type to get basic PLY I/O done. Also, note that these numbers report only simple
 |  Library  |   Read LOC  | Write LOC |
 |:---------:|:-----------:|:---------:|
 | miniply   |    35       |  N/A      |
-| microply  |    25       |  N/A      |
-| mshply    |    29       |   23      |
+| micro_ply |    25       |  N/A      |
+| msh_ply   |    29       |   23      |
 | nanoply   |    23       |   29      |
 | plylib    |    78       |   65      |
 | rply      |    69       |   23      |

@@ -30,7 +30,7 @@ read_ply( const char* filename, TriMesh* mesh, bool *is_binary )
 	void  *data;
 	size_t size;
 	FILE  *fp;
-	if (fopen_s(&fp, filename, "rb") != 0 || fp == nullptr)
+	if ((fp = fopen(filename, "rb")) == nullptr)
   {
 		return false;
 	}

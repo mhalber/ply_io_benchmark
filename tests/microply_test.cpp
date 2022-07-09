@@ -53,11 +53,11 @@ read_ply( const char* filename, TriMesh* mesh, bool *is_binary )
 		{ PLY_PROP_POSITION_X,  ply_prop_decimal, sizeof(float), 0,  &fzero },
 		{ PLY_PROP_POSITION_Y,  ply_prop_decimal, sizeof(float), 4,  &fzero },
 		{ PLY_PROP_POSITION_Z,  ply_prop_decimal, sizeof(float), 8,  &fzero } };
-  ply_convert(&file, PLY_ELEMENT_VERTICES, map_verts, COUNTOF(map_verts), sizeof(Vec3f), (void **)&mesh->vertices, &mesh->n_verts);
+  ply_convert(&file, PLY_ELEMENT_VERTICES, map_verts, msh_count_of(map_verts), sizeof(Vec3f), (void **)&mesh->vertices, &mesh->n_verts);
 
 	uint32_t  izero = 0;
 	ply_map_t map_inds[] = { { PLY_PROP_INDICES, ply_prop_uint, sizeof(uint32_t), 0, &izero } };
-	ply_convert(&file, PLY_ELEMENT_FACES, map_inds, COUNTOF(map_inds), sizeof(uint32_t), (void **)&mesh->faces, &mesh->n_faces);
+	ply_convert(&file, PLY_ELEMENT_FACES, map_inds, msh_count_of(map_inds), sizeof(uint32_t), (void **)&mesh->faces, &mesh->n_faces);
   mesh->n_faces /= 3;
   
 	// You gotta free the memory manually!

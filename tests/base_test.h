@@ -1,5 +1,7 @@
 /* This files stores common datastructures and functions required to run test using each of the benchmarks */
 
+#define COUNTOF(array) (sizeof(array) / sizeof(array[0]))
+
 typedef struct options
 {
   bool verbose;

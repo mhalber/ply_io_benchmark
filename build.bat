@@ -2,14 +2,18 @@
 
 rem A simple batch file for compiling the binaries to run the benchmarks
 
-rem dev_dir is a directory which stores the msh folder. You can get msh from: https://github.com/mhalber/msh
+IF "%~1"=="" (
+  echo "Please provide path to where `msh` library is stored. You can get `msh` from "https://github.com/mhalber/msh"
+  exit /B 1
+)
 
 set opts_c=-D_CRT_SECURE_NO_WARNINGS -nologo -FC -EHa- -GR- -O2 -W3
 set opts_cpp= -D_CRT_SECURE_NO_WARNINGS -nologo -FC -EHsc -O2 -W3
-set dev_dir="..\..\..\dev"
-set lib_dir="..\plylibs"
-set tests_dir="..\tests"
+set dev_dir=..\%~1
+set lib_dir=..\plylibs
+set tests_dir=..\tests
 set include_dirs=-I%dev_dir% -I%lib_dir% -I%tests_dir%
+echo %dev_dir%
 pushd bin
 
 cl %opts_cpp% %include_dirs% %tests_dir%\happly_test.cpp -Fe"happly_test.exe"

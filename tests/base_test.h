@@ -75,6 +75,7 @@ run_test(const char* program_name, bool is_able_to_write_ply, int argc, char** a
   t2 = msh_time_now();
   double read_time = msh_time_diff_ms( t2, t1 );
 
+  msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   double write_time = -1.0f;
   if( opts.output_filename )
   {
@@ -86,7 +87,6 @@ run_test(const char* program_name, bool is_able_to_write_ply, int argc, char** a
   
   msh_cprintf( !opts.verbose, "%f %f\n", read_time, write_time );
 
-  msh_cprintf( opts.verbose, "Reading done in %lf ms\n", read_time );
   msh_cprintf( opts.verbose && opts.output_filename, "Writing done in %lf ms\n", write_time );
   msh_cprintf( opts.verbose, "N. Verts : %d; N. Faces: %d\n", mesh.n_verts, mesh.n_faces );
 

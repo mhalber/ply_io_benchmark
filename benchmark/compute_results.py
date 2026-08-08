@@ -32,9 +32,8 @@ def print_full_table( model_names, method_names, values, filename=None ):
         value = values[i][j]
         print("%10.3f |" % (value), end="", file=f )
       print("", file=f )
- 
+
 def print_average_table( model_names, method_names, values, filename = None ):
-  print("TEST")
   with open(filename, "w") as f:
     print( "|%-10s |%-10s |" % ("Method", "Time(ms)"), file=f)
     print( "-" * 10, end="", file=f)
@@ -52,7 +51,7 @@ def print_average_table( model_names, method_names, values, filename = None ):
       if len(cur_values):
         average = sum(cur_values) / len(cur_values)
       method_average_times[method] = average
-    
+
     min_method = min( method_average_times, key=method_average_times.get)
     min_time = method_average_times[min_method]
     for i in range(0, len(method_names)):
@@ -117,14 +116,14 @@ def create_results_figure( model_names, method_names, values, filename ):
 
 def compute_results(results_folder, output_base_name):
   results_names = [r for r in listdir( results_folder ) if isfile(join(results_folder, r))]
-  
+
   # a bit of roundabout way of doing this but its late and I want to be done
   # Essentially we need to figure out what is the number of methods and method of models
   method_set = set()
   model_set = set()
   for result_name in results_names:
     base_name, ext = result_name.split('.')
-    if ext!="txt": 
+    if ext!="txt":
       continue
     tokens = base_name.split('_')
     method_name = tokens[0]
@@ -144,7 +143,7 @@ def compute_results(results_folder, output_base_name):
   model_names = sorted(list(model_set))
   all_read_times = []
   all_write_times = []
-  
+
   # read in the result data
   for i in range(0, len(method_names)):
     method = method_names[i]
@@ -167,7 +166,7 @@ def compute_results(results_folder, output_base_name):
     all_read_times.append( read_times )
     if (method != "miniply") and (method != "microply"):
       all_write_times.append( write_times )
-  
+
   avg_read_table_filename = output_base_name + "_read_avg_table.md"
   full_read_table_filename = output_base_name + "_read_full_table.md"
   read_fig_filename = output_base_name + "_read_fig.png"
@@ -175,7 +174,7 @@ def compute_results(results_folder, output_base_name):
   print_average_table( model_names, method_names, all_read_times, avg_read_table_filename )
   print_full_table( model_names, method_names, all_read_times, full_read_table_filename )
   create_results_figure( model_names, method_names, all_read_times, read_fig_filename )
-  
+
   method_names.remove("miniply")
   method_names.remove("microply")
 

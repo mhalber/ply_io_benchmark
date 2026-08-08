@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -98,37 +98,17 @@ public:
   Layout() = default;
 
   /// Constructs a layout representation of some element, and specifies a target
-  /// list of elements that will be written to by the PLY parser.
-  ///
-  /// \param v list of elements to be assigned to by the PLY parser
-  template<typename T>
-  Layout(std::vector<T> &v)
-      : data_{reinterpret_cast<std::uint8_t *>(v.data())},
-        cdata_{data_},
-        size_{v.size()},
-        alignment_{alignof(T)}
-  {
-  }
-
-  /// Constructs a layout representation of some element, and specifies a target
   /// list of elements that will be read from by the PLY writer.
   ///
   /// \param v list of elements to be read from by the PLY writer
   template<typename T>
   Layout(const std::vector<T> &v)
-      : data_{nullptr},
-        cdata_{reinterpret_cast<const std::uint8_t *>(v.data())},
+      : cdata_{reinterpret_cast<const std::uint8_t *>(v.data())},
         size_{v.size()},
         alignment_{alignof(T)}
   {
   }
 
-  /// Returns a pointer to the memory area storing instances of type `T`
-  /// associated with this layout.
-  ///
-  /// \return a pointer to the memory area storing instances of type `T`
-  ///    associated with this layout.
-  std::uint8_t *data() { return data_; }
   /// Returns a pointer to the read-only memory area storing instances of type
   /// `T` associated with this layout.
   ///
@@ -149,9 +129,6 @@ public:
   std::size_t alignment() const { return alignment_; }
 
 private:
-  /// Pointer to the writable memory area that contains `n` number of structures
-  /// made up of the types associated with this layout.
-  std::uint8_t *data_{nullptr};
   /// Pointer to the read-only memory area that contains `n` number of
   /// structures made up of the types associated with this layout.
   const std::uint8_t *cdata_{nullptr};

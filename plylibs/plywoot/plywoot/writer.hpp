@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -319,9 +319,15 @@ private:
     if constexpr (std::is_same_v<Policy, AsciiWriterPolicy>)
     {
       src = writeProperty<T>(src, first, last);
-      first += detail::numProperties<T>();
-      if (first < last) { this->writeTokenSeparator(); }
-      return writeProperties<Policy, U, Ts...>(src, first, last);
+      if (detail::numProperties<T>() < last - first)
+      {
+        this->writeTokenSeparator();
+        return writeProperties<Policy, U, Ts...>(src, first + detail::numProperties<T>(), last);
+      }
+      else
+      {
+        return writeProperties<Policy, U, Ts...>(src, last, last);
+      }
     }
     else
     {
@@ -341,7 +347,7 @@ private:
 
     // In case the element defines more properties than the source data,
     // append the missing properties with a default value of zero.
-    if (detail::numProperties<Ts...>() < static_cast<std::size_t>(std::distance(first, last)))
+    if (detail::numProperties<Ts...>() < std::distance(first, last))
     {
       this->writeMissingProperties(first + detail::numProperties<Ts...>(), last);
     }

@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,15 +41,14 @@ public:
   template<typename T, typename EndiannessDependent = Endianness>
   void writeNumber(T t) const
   {
-    // TODO(ton): this assumes the target architecture is little endian.
-    if constexpr (std::is_same_v<EndiannessDependent, LittleEndian>)
+    if constexpr (std::is_same_v<EndiannessDependent, HostEndian>)
     {
       os_.write(reinterpret_cast<const char *>(&t), sizeof(T));
     }
     else
     {
-      const auto be = htobe(t);
-      os_.write(reinterpret_cast<const char *>(&be), sizeof(T));
+      const auto bs = byte_swap(t);
+      os_.write(reinterpret_cast<const char *>(&bs), sizeof(T));
     }
   }
 
@@ -60,7 +59,7 @@ public:
   template<typename PlySizeT, typename PlyT, typename SrcT, typename EndiannessDependent = Endianness>
   void writeList(const SrcT *t, std::size_t n) const
   {
-    writeNumber<PlySizeT>(n);
+    writeNumber<PlySizeT>(static_cast<PlySizeT>(n));
     writeNumbers<PlyT, SrcT>(t, n);
   }
 
@@ -69,13 +68,13 @@ public:
   template<typename PlyT, typename SrcT, typename EndiannessDependent = Endianness>
   void writeNumbers(const SrcT *t, std::size_t n) const
   {
-    if constexpr (std::is_same_v<PlyT, SrcT> && std::is_same_v<EndiannessDependent, LittleEndian>)
+    if constexpr (std::is_same_v<PlyT, SrcT> && std::is_same_v<EndiannessDependent, HostEndian>)
     {
       os_.write(reinterpret_cast<const char *>(t), sizeof(SrcT) * n);
     }
     else
     {
-      for (std::size_t i = 0; i < n; ++i) { writeNumber<PlyT>(*t++); }
+      for (std::size_t i = 0; i < n; ++i) { writeNumber<PlyT>(static_cast<const PlyT>(*t++)); }
     }
   }
 

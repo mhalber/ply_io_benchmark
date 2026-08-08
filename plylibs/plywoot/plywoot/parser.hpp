@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -167,34 +167,33 @@ public:
   // TODO(ton): probably better to add another parameter 'size' to guard
   // against overwriting the input buffer.
   template<typename... Ts>
-  void read(const PlyElement &element, reflect::Layout<Ts...> layout) const
+  void read(const PlyElement &element, std::uint8_t *dest, std::size_t alignment) const
   {
     if constexpr (MaybeMemcpyable<Ts...>::value)
     {
       if (detail::isMemcpyable<Ts...>(element.properties().begin(), element.properties().end()))
       {
-        this->template memcpy<Ts...>(layout.data(), element);
+        this->template memcpy<Ts...>(dest, element);
         return;
       }
     }
 
-    readElements<Ts...>(element, layout);
+    readElements<Ts...>(element, dest, alignment);
   }
 
   void skip(const PlyElement &element) const { this->skipElement(element); }
 
 private:
   template<typename... Ts>
-  void readElements(const PlyElement &element, reflect::Layout<Ts...> layout) const
+  void readElements(const PlyElement &element, std::uint8_t *dest, std::size_t alignment) const
   {
     const PlyPropertyConstIterator first = element.properties().begin();
     const PlyPropertyConstIterator last = element.properties().end();
-    const PlyPropertyConstIterator firstToSkip = first + detail::numProperties<Ts...>();
 
-    std::uint8_t *dest = layout.data();
-
-    if (firstToSkip < last)
+    if (detail::numProperties<Ts...>() < (last - first))
     {
+      const PlyPropertyConstIterator firstToSkip = first + detail::numProperties<Ts...>();
+
       // In case any property that needs to be skipped is a list property, take
       // the expensive code path. Otherwise, we can calculate the exact number
       // of bytes to skip over.
@@ -202,7 +201,7 @@ private:
       {
         for (std::size_t i{0}; i < element.size(); ++i)
         {
-          dest = detail::align(readElement<Ts...>(dest, first, last), layout.alignment());
+          dest = detail::align(readElement<Ts...>(dest, first, last), alignment);
 
           auto curr = firstToSkip;
           while (curr < last) this->skipProperty(*curr++);
@@ -215,13 +214,13 @@ private:
         // any bytes need to be skipped, the ASCII parser will just ignore the
         // remainder of the line to read, and as such skip to the next element.
         const std::size_t numBytesToSkip =
-            std::accumulate(firstToSkip, last, 0ul, [](std::size_t acc, const PlyProperty &p) {
+            std::accumulate(firstToSkip, last, std::size_t{0}, [](std::size_t acc, const PlyProperty &p) {
               return acc + sizeOf(p.isList() ? p.sizeType() : p.type());
             });
 
         for (std::size_t i{0}; i < element.size(); ++i)
         {
-          dest = detail::align(readElement<Ts...>(dest, first, last), layout.alignment());
+          dest = detail::align(readElement<Ts...>(dest, first, last), alignment);
           this->skipProperties(numBytesToSkip);
         }
       }
@@ -230,7 +229,7 @@ private:
     {
       for (std::size_t i{0}; i < element.size(); ++i)
       {
-        dest = detail::align(readElement<Ts...>(dest, first, last), layout.alignment());
+        dest = detail::align(readElement<Ts...>(dest, first, last), alignment);
       }
     }
   }
@@ -256,8 +255,8 @@ private:
     std::vector<DestT> &v = *reinterpret_cast<std::vector<DestT> *>(dest);
 
     const PlySizeT size = this->template readNumber<PlySizeT>();
-    v.reserve(size);
-    for (PlySizeT i = 0; i < size; ++i) { v.push_back(this->template readNumber<PlyT>()); }
+    v.reserve(static_cast<std::size_t>(size));
+    for (PlySizeT i = 0; i < size; ++i) { v.push_back(static_cast<DestT>(this->template readNumber<PlyT>())); }
 
     return dest + sizeof(std::vector<DestT>);
   }
@@ -306,7 +305,7 @@ private:
     if constexpr (std::is_arithmetic_v<DestT>)
     {
       dest = static_cast<std::uint8_t *>(detail::align(dest, alignof(DestT)));
-      *reinterpret_cast<DestT *>(dest) = this->template readNumber<PlyT>();
+      *reinterpret_cast<DestT *>(dest) = static_cast<DestT>(this->template readNumber<PlyT>());
       return dest + sizeof(DestT);
     }
     else { return static_cast<std::uint8_t *>(detail::align(dest, alignof(DestT))) + sizeof(DestT); }

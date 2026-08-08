@@ -77,6 +77,7 @@ Below is a list of libraries used in this benchmark:
 | [micro_ply](https://github.com/maluoi/header-libs) | [Nick Klingensmith](https://github.com/maluoi)   | c++ | :x: | Only supports reading ASCII PLY files  | 
 | [nanoply](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/nanoply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib) | c++ | :x: |
 | [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib)  | c++ |  :x: | PLY reading/writing used by Meshlab(?)
+| [plywoot](https://github.com/ton/PLYwoot) | [Ton van den Heuvel](https://github.com/ton) | c++ | :heavy_check_mark: | |
 | [tinyply](https://github.com/ddiakopoulos/tinyply) | [Dimitri Diakopoulos](https://github.com/ddiakopoulos) | c++ |  :heavy_check_mark: | This benchmark includes versions 2.1, 2.2 and 2.3 of this library. 
 
 For the usage examples, as well as some additional comments about each of the libraries please check the tests/*_test.c(pp) files.
@@ -86,14 +87,61 @@ For the usage examples, as well as some additional comments about each of the li
 Below we present results for parsing PLY files storing data in both ASCII and binary format (little-endian). Times are given in milliseconds. Highlighted numbers indicate the best method in each category.
 As noted before, where applicable, a known list size is passed to the library.
 
-The benchmark was compiled using MSVC 19.28.29334 with \O2 optimization flag, using AMD Ryzen 3900XT and Samsung 970 EVO PLUS.
+The benchmark was compiled using MSVC 19.44.35219 with \O2 optimization flag, using AMD Ryzen 9 9950X3D and Samsung 990 PRO.
 
 To run the test, we run a separate program for each file that attempts to read and write the input file, and reports time taken to do so. Program for each library is run 10 times and the results are averaged. 
 The averaged time taken for each model is used to compute the overall average time it took to process all the models.
 
-* Disclaimer: I am the author of msh_ply library. If you see any deficiencies in code for other libraries, don't hesitate to let me know - I hope to make this benchmark as fair as possible. *
+*Disclaimer*: I am the author of msh_ply library. If you see any deficiencies in the test code for other libraries, don't hesitate to let me know - I hope to make this benchmark as fair as possible.
+
+
 
 ### Average Read Times
+
+
+|Method     |  ASCII             |         Binary    |
+-----------:|-------------------:|------------------:|
+|happly     |    6512.432(47.4x) |    343.835(20.5x) |
+|microply   |      503.298(3.7x) |               N/A |
+|miniply    |  **137.286(1.0x)** |      20.729(1.2x) |
+|mshply     |      942.823(6.9x) |      22.553(1.3x) |
+|nanoply    |    2889.588(21.0x) |      57.136(3.4x) |
+|plylib     |     1295.420(9.4x) |    236.519(14.1x) |
+|PLYwoot    |      430.892(3.1x) |  **16.737(1.0x)** |
+|rply       |      666.417(4.9x) |     149.689(8.9x) |
+|tinyply21  |    4510.273(32.9x) |    897.768(53.6x) |
+|tinyply22  |    2794.483(20.4x) |    177.231(10.6x) |
+|tinyply23  |    2795.661(20.4x) |    176.864(10.6x) |
+|turkply    |      871.158(6.3x) |    319.420(19.1x) |
+
+
+### Average Write Times
+
+|Method      |           ASCII    |            Binary  |
+|-----------:|-------------------:|-------------------:|
+|happly      |    4251.708(14.2x) |     733.696(20.8x) |
+|mshply      |    1511.551(5.1x)  |   **35.242(1.0x)** |
+|nanoply     |    3227.812(10.8x) |       55.714(1.6x) |
+|plylib      |    1231.592(4.1x)  |      198.134(5.6x) |
+|plywoot     |  **299.168(1.0x)** |       69.097(2.0x) |
+|rply        |    1478.005(4.9x)  |      118.080(3.4x) |
+|tinyply21   |    3543.509(11.8x) |     547.373(15.5x) |
+|tinyply22   |    3575.069(12.0x) |      207.699(5.9x) |
+|tinyply23   |    3347.977(11.2x) |      209.590(5.9x) |
+|turkply     |    1538.652(5.1x)  |      338.245(9.6x) |
+
+**Notes**:
+ - For absolute fastest binary read times, use PLYwoot. Kinda taken aback by the speed. Also incredibly fast ASCII writes!
+ - miniply offers great performance for reading both aSCII and binary. Great choice for C++
+ - miniply and micro_ply do not support the writing of ply files.
+ - micro_ply does not support binary files, only ASCII format.
+ - In C, when you need decent read and write performance, msh_ply is a good choice ;). However, it's ASCII mode requires work, so if your models are mostly stored in ASCII, you might want to use other libraries.
+ - Some libraries were modified to include getter to establish whether input is binary or ASCII.
+ - In ASCII mode, happly is unable to convert between __uint__ and __int__. Since some models (angel, bust_of_sappho, bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse the two aforementioned models and would need to be recompiled to support the specific type. Here, we simply omit these models when benchmarking happly.
+ - The assets folder contains older tables run using older machine with AMD Ryzen 3900XT and Samsung 970 EVO PLUS. Old tables below. They do not include PLYwoot
+ 
+<details>
+<summary> Average read times</summary>
 
 |Method     | ASCII             |           Binary   |
 -----------:|------------------:|-------------------:|
@@ -109,8 +157,10 @@ The averaged time taken for each model is used to compute the overall average ti
 |tinyply23  |   7500.844(29.6x) |      294.265(8.2x) |
 |turkply    |    2086.552(8.2x) |      549.367(15.3x)|
 
+</details>
 
-### Average Write Times
+<details>
+<summary> Average Write Times
 
 |Method      |           ASCII    |            Binary  |
 |-----------:|-------------------:|-------------------:|
@@ -124,15 +174,9 @@ The averaged time taken for each model is used to compute the overall average ti
 |tinyply23   |     9653.622(3.2x) |      560.677(7.6x) |
 |turkply     |     4017.640(1.3x) |      624.668(8.5x) |
 
-**Notes**:
- - miniply is the fastest library for reading the ply files. If you're only interested in reading files and use C++, it is a great choice.
- - miniply and micro_ply do not support the writing of ply files.
- - micro_ply does not support binary files, only ASCII format.
- - In C, when you need decent read and write performance, msh_ply is a good choice ;). However, it's ASCII mode requires work, so if your models are mostly stored in ASCII, you might want to use other libraries.
- - Some libraries were modified to include getter to establish whether input is binary or ASCII.
- - In ASCII mode, happly is unable to convert between __uint__ and __int__. Since some models (angel, bust_of_sappho, bust_of_angelique_dhannetaire ) contain vertex list specified as __uint__, while others use __int__, happly fails to parse the two aforementioned models and would need to be recompiled to support the specific type. Here, we simply omit these models when benchmarking happly.
- 
- ### Per model I/O times:
+</details>
+
+### Per model I/O times:
 
 |  |  |  |  |  |
 |-:|--|--|--|--|
@@ -143,8 +187,9 @@ Note that the images show the read time on a log scale, since the performance of
 
 ## LOC
 
-Another metric we can use for deciding a library is the ease of use. Why LOC is by no means a perfect metric to measure ease of use, it does reflect how much code one needs to
-type to get basic PLY I/O done. Also, note that these numbers report only simple versions of reading function without any error reporting, etc.
+Another metric we can use for deciding a library is the ease of use. Why LOC is by no means a perfect metric to measure ease of use, it does reflect how much code one needs to type to get basic PLY I/O done. Also, note that these numbers report only simple versions of reading function without any error reporting, etc.
+
+One can argue that this is even less relevant in the age of AI agents, but I leve it here for reference.
 
 |  Library  |   Read LOC  | Write LOC |
 |:---------:|:-----------:|:---------:|

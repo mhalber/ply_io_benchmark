@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -55,9 +55,26 @@ constexpr Ptr align(Ptr ptr, std::size_t alignment)
   // 0b111100. The factor (uintptr + alignment - 1u) guarantees that the
   // alignment bit is set unless (uintptr % alignment == 0).
   const auto uintptr = reinterpret_cast<uintptr_t>(ptr);
-  return reinterpret_cast<Ptr>((uintptr + alignment - 1u) & -alignment);
+  return reinterpret_cast<Ptr>((uintptr + alignment - 1u) & (~alignment + 1u));
 }
 
+/// Aligns the given input pointer. Implementation is taken from GCCs
+/// `std::align` implementation. The given alignment value should be a power
+/// of two.
+///
+/// \param ptr pointer to align
+/// \param alignment alignment requirements of the given pointer
+/// \return \p ptr aligned according to the given alignment requirements
+template<>
+constexpr std::size_t align(std::size_t ptr, std::size_t alignment)
+{
+  // Some explanation on the code below; -x is x in two's complement, which
+  // means that an alignment value x of power two is converted to (~x + 1).
+  // For example, for an alignment value of 4, this turns 0b000100 into
+  // 0b111100. The factor (ptr + alignment - 1u) guarantees that the
+  // alignment bit is set unless (ptr % alignment == 0).
+  return (ptr + alignment - 1u) & (~alignment + 1u);
+}
 
 /// Converts a text to an integer number. The <a
 /// href="https://github.com/ton/fast_int">fast_int</a> library will be used to
@@ -70,14 +87,18 @@ constexpr Ptr align(Ptr ptr, std::size_t alignment)
 ///     text
 /// \return converted integer number
 template<typename Number>
+#ifdef PLYWOOT_USE_FAST_INT
 inline Number to_number(const char *first, const char *last, const char **end)
+#else
+inline Number to_number(const char *first, const char *, const char **end)
+#endif
 {
 #ifdef PLYWOOT_USE_FAST_INT
   Number n{};
   *end = fast_int::from_chars(first, last, n).ptr;
   return n;
 #else
-  return std::strtoll(first, const_cast<char **>(end), 10);
+  return static_cast<Number>(std::strtoll(first, const_cast<char **>(end), 10));
 #endif
 }
 
@@ -92,7 +113,11 @@ inline Number to_number(const char *first, const char *last, const char **end)
 ///     text
 /// \return converted single precision floating point number
 template<>
+#ifdef PLYWOOT_USE_FAST_FLOAT
 inline float to_number<>(const char *first, const char *last, const char **end)
+#else
+inline float to_number<>(const char *first, const char *, const char **end)
+#endif
 {
 #ifdef PLYWOOT_USE_FAST_FLOAT
   float x;
@@ -114,7 +139,11 @@ inline float to_number<>(const char *first, const char *last, const char **end)
 ///     text
 /// \return converted double precision floating point number
 template<>
+#ifdef PLYWOOT_USE_FAST_FLOAT
 inline double to_number<double>(const char *first, const char *last, const char **end)
+#else
+inline double to_number<double>(const char *first, const char *, const char **end)
+#endif
 {
 #ifdef PLYWOOT_USE_FAST_FLOAT
   double x;

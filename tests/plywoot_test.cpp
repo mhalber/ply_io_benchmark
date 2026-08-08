@@ -11,7 +11,7 @@ g++ -I<path_to_msh> -Iplywoot/ -O2 -std=c++17 plywoot_test.cpp -o
 bin/plywoot_test
 
 */
-#include "plywoot.hpp"
+#include "plywoot/plywoot.hpp"
 #include <cstring>
 #include <fstream>
 #include <iostream>

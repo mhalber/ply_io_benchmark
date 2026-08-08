@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -194,13 +194,13 @@ public:
   /// Move constructor implemented in terms of move assignment for simplicity.
   ///
   /// \param x PLY element data instance to construct from
-  PlyElementData(PlyElementData &&x) { *this = std::move(x); }
+  PlyElementData(PlyElementData &&x) noexcept { *this = std::move(x); }
 
   /// Move assignment operator.
   ///
   /// \param x PLY element data instance to move assign from
   /// \return a reference to this newly assigned element data instance
-  PlyElementData &operator=(PlyElementData &&x)
+  PlyElementData &operator=(PlyElementData &&x) noexcept
   {
     element_ = std::move(x.element_);
     data_.reset(x.data_.release());

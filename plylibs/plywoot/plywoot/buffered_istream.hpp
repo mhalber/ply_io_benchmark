@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -74,29 +74,6 @@ public:
     return *reinterpret_cast<const T *>(t);
   }
 
-  /// Copies `n` bytes to the given destination buffer, assuming it may hold
-  /// that many bytes. Returns a pointer pointing to one byte after the last
-  /// byte that was copied to `dest`.
-  inline std::uint8_t *memcpy(std::uint8_t *dest, std::size_t n)
-  {
-    if (n > IStreamBufferSize)
-    {
-      const std::size_t remaining = eob_ - c_;
-      std::memcpy(dest, c_, remaining);
-      is_.read(reinterpret_cast<char *>(dest) + remaining, n - remaining);
-      c_ = eob_;
-    }
-    else
-    {
-      if (c_ + n > eob_) buffer(n);
-
-      std::memcpy(dest, c_, n);
-      c_ += n;
-    }
-
-    return dest + n;
-  }
-
   /// Reads `N` objects of the given type `From` from the input data stream, and
   /// stores them contiguously at the given destination in memory as numbers of
   /// type `To`.
@@ -118,12 +95,35 @@ public:
 
       const From *from = reinterpret_cast<const From *>(c_);
       To *to = reinterpret_cast<To *>(dest);
-      for (std::size_t i = 0; i < N; ++i) { *to++ = *from++; }
+      for (std::size_t i = 0; i < N; ++i) { *to++ = static_cast<To>(*from++); }
 
       c_ += bytesToRead;
 
       return reinterpret_cast<std::uint8_t *>(to);
     }
+  }
+
+  /// Copies `n` bytes to the given destination buffer, assuming it may hold
+  /// that many bytes. Returns a pointer pointing to one byte after the last
+  /// byte that was copied to `dest`.
+  inline std::uint8_t *memcpy(std::uint8_t *dest, std::size_t n)
+  {
+    if (n > IStreamBufferSize)
+    {
+      const std::size_t remaining = eob_ - c_;
+      std::memcpy(dest, c_, remaining);
+      is_.read(reinterpret_cast<char *>(dest) + remaining, n - remaining);
+      c_ = eob_;
+    }
+    else
+    {
+      if (c_ + n > eob_) buffer(n);
+
+      std::memcpy(dest, c_, n);
+      c_ += n;
+    }
+
+    return dest + n;
   }
 
   /// Skips the given number of bytes in the input stream.
@@ -186,7 +186,7 @@ public:
         // In case the buffer is only partially filled, fill the remainder with
         // EOF characters.
         remaining += is_.gcount();
-        std::fill_n(buffer_.get() + remaining, IStreamBufferSize - remaining, EOF);
+        std::fill_n(buffer_.get() + remaining, IStreamBufferSize - remaining, static_cast<char>(EOF));
       }
 
       c_ = buffer_.get();
@@ -202,7 +202,7 @@ private:
       // In case the buffer is only partially filled, fill the remainder with
       // EOF characters.
       auto remaining = is_.gcount();
-      std::fill_n(buffer_.get() + remaining, IStreamBufferSize - remaining, EOF);
+      std::fill_n(buffer_.get() + remaining, IStreamBufferSize - remaining, static_cast<char>(EOF));
     }
 
     c_ = buffer_.get();

@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -55,6 +55,12 @@ namespace plywoot::detail {
 
 static constexpr const char endHeaderToken[] = "end_header";
 
+inline std::istream &getline_without_linefeed(std::istream &is, std::string &s)
+{
+  if (std::getline(is, s) && !s.empty() && s.back() == '\r') s.pop_back();
+  return is;
+}
+
 /// Lookup table to check whether a character is a token delimiter.
 /// The following characters are token delimiters:
 ///
@@ -93,12 +99,12 @@ class HeaderScanner
 public:
   /// Constructs a header scanner for the PLY header defined in the given input
   /// stream. Throws `InvalidInputStream` in case the input stream is not valid.
-  HeaderScanner(std::istream &is) : is_{is}
+  HeaderScanner(std::istream &is)
   {
     if (!is) { throw InvalidInputStream{}; }
 
     std::string line;
-    while (bool(std::getline(is, line)) && line != endHeaderToken)
+    while (bool(detail::getline_without_linefeed(is, line)) && line != endHeaderToken)
     {
       buffer_.append(line);
       buffer_.push_back('\n');
@@ -344,9 +350,6 @@ private:
   std::string_view tokenString_;
   /// Current line number.
   std::uint32_t line_{0};
-
-  /// Reference to the wrapped input stream.
-  std::istream &is_;
 };
 
 }

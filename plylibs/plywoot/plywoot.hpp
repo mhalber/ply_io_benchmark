@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
 #include <cstdint>
 #include <functional>
 #include <istream>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -77,13 +78,11 @@ public:
   /// \return a pair where the first element is a copy of the element in case it
   ///   exists, and the second element is a Boolean indicating whether the
   ///   requested element was found
-  // TODO(ton): change return type to an optional.
-  std::pair<PlyElement, bool> element(const std::string &name) const
+  std::optional<PlyElement> element(const std::string &name) const
   {
     const auto it = std::find_if(
         elements_.begin(), elements_.end(), [&](const PlyElement &e) { return e.name() == name; });
-    return it != elements_.end() ? std::pair<PlyElement, bool>{*it, true}
-                                 : std::pair<PlyElement, bool>{{}, false};
+    return it != elements_.end() ? std::optional(*it) : std::nullopt;
   }
 
   /// Returns the format of the input PLY data stream.
@@ -105,6 +104,7 @@ public:
   }
 
   /// Returns a copy of the current element that can be either read or skipped.
+  /// In case no element can be read, returns a default constructed element.
   ///
   /// \return  a copy of the current element that can be either read or skipped
   PlyElement element() const { return hasElement() ? *currElement_ : PlyElement{}; }
@@ -125,6 +125,28 @@ public:
   ///     representing all data for the active element to be parsed
   PlyElementData readElement() const { return parser_.read(*currElement_++); }
 
+  /// Reads the current element from the PLY input data stream into memory
+  /// pointed to by \p dest, where the `Layout` type is used to identify how
+  /// properties from the PLY element are mapped on objects of type `T`.
+  ///
+  /// \param dest pointer to the memory where elements of type T need to be
+  ///    written to
+  /// \tparam T type of objects to be read from the stream
+  /// \tparam Layout layout specifying the mapping of PLY properties to `T`
+  /// \pre `hasElement()` must be \c true
+  /// \note This assumes that \p dest points to a block of memory that allows
+  ///     holding at least as many instances of T as the size of the element
+  ///     that is being read!
+  /// \return a vector of object of type `T` representing the element that was
+  ///     parsed using the PLY property mapping embedded in the given `Layout`
+  ///     type
+  // TODO(ton): probably better to add another parameter 'size' to guard
+  template<typename T, typename Layout>
+  void readElement(T *dest) const
+  {
+    parser_.read<Layout>(*currElement_++, reinterpret_cast<std::uint8_t *>(dest), alignof(T));
+  }
+
   /// Reads the current element from the PLY input data stream, returning a list
   /// of objects of type `T`, where the `Layout` type is used to identify how
   /// properties from the PLY element are mapped on objects of type `T`.
@@ -135,13 +157,12 @@ public:
   /// \return a vector of object of type `T` representing the element that was
   ///     parsed using the PLY property mapping embedded in the given `Layout`
   ///     type
-  // TODO(ton): add more extensive documentation
   // TODO(ton): probably better to add another parameter 'size' to guard
   template<typename T, typename Layout>
   std::vector<T> readElement() const
   {
     std::vector<T> result(currElement_->size());
-    parser_.read(*currElement_++, Layout{result});
+    parser_.read<Layout>(*currElement_++, reinterpret_cast<std::uint8_t *>(result.data()), alignof(T));
     return result;
   }
 
@@ -218,7 +239,7 @@ public:
 
     elementWriteClosures_.emplace_back(
         std::move(layoutElement),
-        [this, layout](detail::WriterVariant &writer, const PlyElement &e) { writer.write(e, layout); });
+        [layout](detail::WriterVariant &writer, const PlyElement &e) { writer.write(e, layout); });
   }
 
   /// Queues the given element data for writing. This takes ownership of the
@@ -228,13 +249,14 @@ public:
   /// \param elementData raw element data to stream to this output stream
   void add(const PlyElementData &elementData)
   {
-    // TODO(ton): once we upgrade to C++17, move capture element data in the
-    // lambda below.
+    // TODO(ton): ideally, move capture element data in the lambda below, but it
+    // runs into the issue that the `std::function` instance needs to be
+    // copyable.
     const std::uint8_t *src = elementData.data();
     const std::size_t alignment = elementData.alignment();
 
     elementWriteClosures_.emplace_back(
-        elementData.element(), [this, src, alignment](detail::WriterVariant &writer, const PlyElement &e) {
+        elementData.element(), [src, alignment](detail::WriterVariant &writer, const PlyElement &e) {
           writer.write(e, src, alignment);
         });
   }
@@ -343,7 +365,6 @@ inline void convert(std::istream &is, std::ostream &os, PlyFormat format)
 
   while (plyIs.hasElement())
   {
-    const plywoot::PlyElement element = plyIs.element();
     elementsData.emplace_back(plyIs.readElement());
     plyOs.add(elementsData.back());
   }

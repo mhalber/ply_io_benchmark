@@ -12,7 +12,6 @@ set dev_dir=%~1
 set lib_dir=..\plylibs
 set tests_dir=..\tests
 set include_dirs=-I%dev_dir% -I%lib_dir% -I%tests_dir%
-echo %dev_dir% %include_dirs%
 pushd bin
 
 cl %opts_cpp% %include_dirs% %tests_dir%\happly_test.cpp -Fe"happly_test.exe"

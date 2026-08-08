@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ public:
     {
       is_.skip(
           e.size() * std::accumulate(
-                         properties.begin(), properties.end(), 0,
+                         properties.begin(), properties.end(), std::size_t{0},
                          [](std::size_t acc, const PlyProperty &p) { return acc + sizeOf(p.type()); }));
     }
     else
@@ -99,10 +99,10 @@ public:
           size = readNumber<unsigned int>();
           break;
         case PlyDataType::Float:
-          size = readNumber<float>();
+          size = static_cast<std::size_t>(readNumber<float>());
           break;
         case PlyDataType::Double:
-          size = readNumber<double>();
+          size = static_cast<std::size_t>(readNumber<double>());
           break;
       }
 
@@ -117,9 +117,8 @@ public:
   template<typename T, typename EndiannessDependent = Endianness>
   T readNumber() const
   {
-    // TODO(ton): this assumes the target architecture is little endian.
-    if constexpr (std::is_same_v<EndiannessDependent, LittleEndian>) { return is_.read<T>(); }
-    else { return betoh(is_.read<T>()); }
+    if constexpr (std::is_same_v<EndiannessDependent, HostEndian>) { return is_.read<T>(); }
+    else { return byte_swap(is_.read<T>()); }
   }
 
   /// Reads `N` numbers of the given type `PlyT` from the input stream, and
@@ -133,17 +132,14 @@ public:
   template<typename PlyT, typename DestT, std::size_t N, typename EndiannessDependent = Endianness>
   std::uint8_t *readNumbers(std::uint8_t *dest) const
   {
-    if constexpr (std::is_same_v<EndiannessDependent, LittleEndian>)
-    {
-      return is_.read<PlyT, DestT, N>(dest);
-    }
+    if constexpr (std::is_same_v<EndiannessDependent, HostEndian>) { return is_.read<PlyT, DestT, N>(dest); }
     else
     {
       std::uint8_t *result = is_.read<PlyT, DestT, N>(dest);
 
       // Perform endianess conversion.
       DestT *to = reinterpret_cast<DestT *>(dest);
-      for (std::size_t i = 0; i < N; ++i, ++to) { *to = betoh(static_cast<PlyT>(*to)); }
+      for (std::size_t i = 0; i < N; ++i, ++to) { *to = static_cast<DestT>(byte_swap(static_cast<PlyT>(*to))); }
 
       return result;
     }
@@ -173,40 +169,40 @@ public:
   {
     is_.memcpy(dest, element.size() * detail::sizeOf<Ts...>());
 
-    if constexpr (std::is_same_v<EndiannessDependent, BigEndian>)
+    if constexpr (!std::is_same_v<EndiannessDependent, HostEndian>)
     {
-      for (std::size_t i = 0; i < element.size(); ++i) { dest = toBigEndian<Ts...>(dest); }
+      for (std::size_t i = 0; i < element.size(); ++i) { dest = byteSwap<Ts...>(dest); }
     }
   }
 
 private:
   template<typename T>
-  std::uint8_t *toBigEndian(std::uint8_t *dest) const
+  std::uint8_t *byteSwap(std::uint8_t *dest) const
   {
     if constexpr (!detail::IsPack<T>::value)
     {
       auto ptr = reinterpret_cast<T *>(dest);
-      *ptr = htobe(*ptr);
+      *ptr = byte_swap(*ptr);
 
       return dest + sizeof(T);
     }
     else
     {
       auto ptr = reinterpret_cast<typename T::DestT *>(dest);
-      for (std::size_t i = 0; i < T::size; ++i, ++ptr) { *ptr = htobe(*ptr); }
+      for (std::size_t i = 0; i < T::size; ++i, ++ptr) { *ptr = byte_swap(*ptr); }
 
       return dest + detail::sizeOf<T>();
     }
   }
 
   template<typename T, typename U, typename... Ts>
-  std::uint8_t *toBigEndian(std::uint8_t *dest) const
+  std::uint8_t *byteSwap(std::uint8_t *dest) const
   {
     static_assert(
         detail::isPacked<T, U, Ts...>(),
-        "converting possibly padded range of little-endian objects to big-endian not implemented yet");
+        "converting endianness of possibly padded range of objects not implemented yet");
 
-    return toBigEndian<U, Ts...>(toBigEndian<T>(dest));
+    return byteSwap<U, Ts...>(byteSwap<T>(dest));
   }
 
   /// Wrapped input stream associated with this binary parser policy.

@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -149,26 +150,16 @@ struct PlyElement
 {
   /// Default constructor.
   PlyElement() = default;
-  /// Constructor taking a name and a list of initial properties to associate
-  /// with this element.
-  ///
-  /// \param name name of the PLY element to construct
-  /// \param properties definitions of the PLY properties embedded in this
-  ///     PLY element
-  PlyElement(std::string name, std::vector<PlyProperty> properties)
-      : name_{std::move(name)}, size_{0}, properties_{std::move(properties)}
-  {
-  }
   /// Constructor taking a name and size for this element.
   ///
   /// \param name name of the PLY element to construct
-  /// \param size TODO
+  /// \param size the number of instances of this element in the PLY file
   PlyElement(std::string name, std::size_t size) : name_{std::move(name)}, size_{size} {}
   /// Constructor taking a name and size for this element, as well as a list
   /// of initial properties to associate with this element.
   ///
   /// \param name name of the PLY element to construct
-  /// \param size TODO
+  /// \param size the number of instances of this element in the PLY file
   /// \param properties definitions of the PLY properties embedded in this
   ///     PLY element
   PlyElement(std::string name, std::size_t size, std::vector<PlyProperty> properties)
@@ -180,10 +171,9 @@ struct PlyElement
   ///
   /// \return the name of this element
   const std::string &name() const { return name_; }
-  /// Returns the size of this element.
+  /// Returns the number of instances of this element in the PLY file
   ///
-  /// \return the size of this element
-  // TODO(ton): remove from this type?
+  /// \return the number of instances of this element in the PLY file
   std::size_t size() const { return size_; }
   /// Returns the properties associated with this element.
   ///
@@ -200,14 +190,12 @@ struct PlyElement
   /// \return a pair where the first element is a copy of the property with
   ///     the given name in case it exists and the second element is a Boolean
   ///     that indicates whether the requested property was found
-  // TODO(ton): return an optional
-  std::pair<PlyProperty, bool> property(const std::string &propertyName) const
+  std::optional<PlyProperty> property(const std::string &propertyName) const
   {
     const auto it = std::find_if(properties_.begin(), properties_.end(), [&](const PlyProperty &p) {
       return p.name() == propertyName;
     });
-    return it != properties_.end() ? std::pair<PlyProperty, bool>{*it, true}
-                                   : std::pair<PlyProperty, bool>{{}, false};
+    return it != properties_.end() ? std::optional(*it) : std::nullopt;
   }
 
   /// Factory method that constructs a new PLY property definition associated
@@ -246,7 +234,7 @@ struct PlyElement
 private:
   /// Name of this element.
   std::string name_;
-  /// Size of this element.
+  /// The number of instances of this element in the PLY file.
   std::size_t size_;
   /// The definitions of the properties contained in this element.
   std::vector<PlyProperty> properties_;

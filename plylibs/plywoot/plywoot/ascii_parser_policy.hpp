@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ public:
     // TODO(ton): needs to be specialized for improved performance.
     for (std::size_t i = 0; i < N; ++i, dest += sizeof(DestT))
     {
-      *reinterpret_cast<DestT *>(dest) = readNumber<PlyT>();
+      *reinterpret_cast<DestT *>(dest) = static_cast<DestT>(readNumber<PlyT>());
     }
     return dest;
   }

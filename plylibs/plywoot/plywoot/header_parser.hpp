@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include <cassert>
 #include <cstdint>
 #include <istream>
+#include <numeric>
 #include <string>
 #include <utility>
 #include <vector>
@@ -69,37 +70,47 @@ struct UnexpectedToken : HeaderParserException
       detail::HeaderScanner::Token expected,
       detail::HeaderScanner::Token found,
       const std::string &tokenString)
-      : HeaderParserException(
-            "unexpected token '" + detail::to_string(found) + "' found, expected '" +
-            detail::to_string(expected) + "' (=" + tokenString + ") instead"),
-        expected_{expected},
-        found_{found}
+      : UnexpectedToken(std::vector{expected}, found, tokenString)
   {
   }
 
   /// Constructs an unexpected token header parser exception for cases where the
   /// expected token is not clearly defined.
   ///
+  /// \param expected list of tokens that were expected
   /// \param found token that was found
   /// \param tokenString textual representation of the token that was found
-  // TODO(ton): fix passing Eof below as the expected token
-  UnexpectedToken(detail::HeaderScanner::Token found, const std::string &tokenString)
-      : UnexpectedToken{detail::HeaderScanner::Token::Eof, found, tokenString}
+  UnexpectedToken(
+      std::vector<detail::HeaderScanner::Token> expected,
+      detail::HeaderScanner::Token found,
+      const std::string &)
+      : HeaderParserException(
+            "unexpected token '" + detail::to_string(found) + "' found, expected a token in the set {" +
+            std::accumulate(
+                std::next(expected.begin()),
+                expected.end(),
+                expected.empty() ? std::string() : detail::to_string(expected.front()),
+                [](auto &&x, auto &&y) {
+                  return x + ", " + detail::to_string(std::forward<decltype(y)>(y));
+                }) +
+            "} instead"),
+        expected_{std::move(expected)},
+        found_{found}
   {
   }
 
-  /// Returns the expected token.
+  /// Returns the list of expected tokens.
   ///
-  /// \return the expected token
-  detail::HeaderScanner::Token expected() const { return expected_; }
+  /// \return the list of expected tokens
+  const std::vector<detail::HeaderScanner::Token> &expected() const { return expected_; }
   /// Returns the token that was found instead of the expected token.
   ///
   /// \return the token that was found instead of the expected token
   detail::HeaderScanner::Token found() const { return found_; }
 
 private:
-  /// Expected token.
-  detail::HeaderScanner::Token expected_;
+  /// Expected tokens.
+  std::vector<detail::HeaderScanner::Token> expected_;
   /// Token that was found instead of the expected token.
   detail::HeaderScanner::Token found_;
 };
@@ -158,7 +169,8 @@ public:
           scanner_.nextToken();
           break;
         default:
-          throw UnexpectedToken(scanner_.token(), scanner_.tokenString());
+          throw UnexpectedToken(
+              {Token::EndHeader, Token::Element, Token::Comment}, scanner_.token(), scanner_.tokenString());
           break;
       }
     } while (scanner_.token() != Token::EndHeader);
@@ -218,8 +230,10 @@ private:
       case Token::Double:
         return PlyDataType::Double;
       default:
-        // TODO(ton): expected is a range of tokens...
-        throw UnexpectedToken(Token::Char, t, scanner_.tokenString());
+        throw UnexpectedToken(
+            {Token::Char, Token::UChar, Token::Short, Token::UShort, Token::Int, Token::UInt, Token::Float,
+             Token::Double},
+            t, scanner_.tokenString());
     }
   }
 

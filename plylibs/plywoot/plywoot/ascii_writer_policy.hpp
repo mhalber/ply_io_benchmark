@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -97,7 +97,11 @@ public:
   /// since in case of a list we store a zero-element list.
   void writeMissingProperties(PlyPropertyConstIterator first, PlyPropertyConstIterator last) const
   {
-    while (first++ != last) { os_.write(" 0", 2); }
+    while (first < last)
+    {
+      os_.write(" 0", 2);
+      ++first;
+    }
   }
 
   /// Writes a newline separator.

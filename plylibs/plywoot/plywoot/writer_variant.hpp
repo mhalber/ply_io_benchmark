@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,9 +35,6 @@ class WriterVariant
 {
 public:
   WriterVariant(std::ostream &os, PlyFormat format) : variant_{makeVariant(os, format)} {}
-
-  WriterVariant(const WriterVariant &) = delete;
-  WriterVariant &operator=(const WriterVariant &) = delete;
 
   void write(const PlyElement &element, const std::uint8_t *src, std::size_t alignment) const
   {

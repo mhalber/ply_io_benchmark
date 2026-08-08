@@ -1,7 +1,7 @@
 /*
    This file is part of PLYwoot, a header-only PLY parser.
 
-   Copyright (C) 2023-2024, Ton van den Heuvel
+   Copyright (C) 2023-2026, Ton van den Heuvel
 
    PLYwoot is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -75,37 +75,37 @@ constexpr bool isList()
 template<typename... Ts>
 struct NumProperties
 {
-  static constexpr std::size_t size = 0;
+  static constexpr std::ptrdiff_t size = 0;
 };
 
 template<typename T, typename... Ts>
 struct NumProperties<T, Ts...>
 {
-  static constexpr std::size_t size = NumProperties<T>::size + NumProperties<Ts...>::size;
+  static constexpr std::ptrdiff_t size = NumProperties<T>::size + NumProperties<Ts...>::size;
 };
 
 template<typename T, std::size_t N>
 struct NumProperties<reflect::Array<T, N>>
 {
-  static constexpr std::size_t size = 1;
+  static constexpr std::ptrdiff_t size = 1;
 };
 
 template<typename T, std::size_t N>
 struct NumProperties<reflect::Pack<T, N>>
 {
-  static constexpr std::size_t size = N;
+  static constexpr std::ptrdiff_t size = N;
 };
 
 template<typename T>
 struct NumProperties<reflect::Stride<T>>
 {
-  static constexpr std::size_t size = 0;
+  static constexpr std::ptrdiff_t size = 0;
 };
 
 template<typename T>
 struct NumProperties<T>
 {
-  static constexpr std::size_t size = 1;
+  static constexpr std::ptrdiff_t size = 1;
 };
 
 /// Returns the number of properties spanned by the given list of reflection
@@ -115,7 +115,7 @@ struct NumProperties<T>
 /// \return the number of properties spanned by the given list of reflection
 ///     types
 template<typename... Ts>
-constexpr std::size_t numProperties()
+constexpr std::ptrdiff_t numProperties()
 {
   return NumProperties<Ts...>::size;
 }
@@ -319,7 +319,7 @@ struct IsMemcpyable
 {
   bool operator()(const PlyPropertyConstIterator first, const PlyPropertyConstIterator last) const
   {
-    return first < last && isSame<T>(first->type());
+    return first != last && isSame<T>(first->type());
   }
 };
 
@@ -335,8 +335,7 @@ struct IsMemcpyable<reflect::Pack<T, N>>
 {
   bool operator()(const PlyPropertyConstIterator first, const PlyPropertyConstIterator last) const
   {
-    return first + N <= last &&
-           std::all_of(first, first + N, [](const PlyProperty &p) { return isSame<T>(p.type()); });
+    return first + N <= last && std::all_of(first, first + N, [](const PlyProperty &p) { return isSame<T>(p.type()); });
   }
 };
 
@@ -354,7 +353,7 @@ struct IsMemcpyable<reflect::Pack<T, N>>
 template<typename T>
 bool isMemcpyable(const PlyPropertyConstIterator first, const PlyPropertyConstIterator last)
 {
-  return first + detail::numProperties<T>() == last && IsMemcpyable<T>{}(first, last);
+  return detail::numProperties<T>() == std::distance(first, last) && IsMemcpyable<T>{}(first, last);
 }
 
 /// Returns whether the range of properties in [`first`, `last`) represents PLY

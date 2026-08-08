@@ -77,7 +77,7 @@ Below is a list of libraries used in this benchmark:
 | [micro_ply](https://github.com/maluoi/header-libs) | [Nick Klingensmith](https://github.com/maluoi)   | c++ | :x: | Only supports reading ASCII PLY files  | 
 | [nanoply](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/nanoply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib) | c++ | :x: |
 | [plylib](https://github.com/cnr-isti-vclab/vcglib/tree/master/wrap/ply) | [vcglib](https://github.com/cnr-isti-vclab/vcglib)  | c++ |  :x: | PLY reading/writing used by Meshlab(?)
-| [plywoot](https://github.com/ton/PLYwoot) | [Ton van den Heuvel](https://github.com/ton) | c++ | :heavy_check_mark: | |
+| [PLYwoot](https://github.com/ton/PLYwoot) | [Ton van den Heuvel](https://github.com/ton) | c++ | :heavy_check_mark: | |
 | [tinyply](https://github.com/ddiakopoulos/tinyply) | [Dimitri Diakopoulos](https://github.com/ddiakopoulos) | c++ |  :heavy_check_mark: | This benchmark includes versions 2.1, 2.2 and 2.3 of this library. 
 
 For the usage examples, as well as some additional comments about each of the libraries please check the tests/*_test.c(pp) files.
@@ -123,7 +123,7 @@ The averaged time taken for each model is used to compute the overall average ti
 |mshply      |    1511.551(5.1x)  |   **35.242(1.0x)** |
 |nanoply     |    3227.812(10.8x) |       55.714(1.6x) |
 |plylib      |    1231.592(4.1x)  |      198.134(5.6x) |
-|plywoot     |  **299.168(1.0x)** |       69.097(2.0x) |
+|PLYwoot     |  **299.168(1.0x)** |       69.097(2.0x) |
 |rply        |    1478.005(4.9x)  |      118.080(3.4x) |
 |tinyply21   |    3543.509(11.8x) |     547.373(15.5x) |
 |tinyply22   |    3575.069(12.0x) |      207.699(5.9x) |

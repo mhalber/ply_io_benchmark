@@ -174,7 +174,7 @@ The averaged time taken for each model is used to compute the overall average ti
 |tinyply23   |     9653.622(3.2x) |      560.677(7.6x) |
 |turkply     |     4017.640(1.3x) |      624.668(8.5x) |
 
-</details>
+</details> dw
 
 ### Per model I/O times:
 
@@ -183,25 +183,7 @@ The averaged time taken for each model is used to compute the overall average ti
 | ASCII | [Read Times Table](assets/ascii_read_full_table.md) | [Read Times Image](assets/ascii_read_fig.png) | [Write Times Table](assets/ascii_write_full_table.md) | [Write Times Image](assets/ascii_write_fig.png) |
 | Binary | [Read Times Table](assets/binary_read_full_table.md) | [Read Times Image](assets/binary_read_fig.png) | [Write Times Table](assets/binary_write_full_table.md) | [Write Times Image](assets/binary_write_fig.png) |
 
-Note that the images show the read time on a log scale, since the performance of different libraries is significantly different.
-
-## LOC
-
-Another metric we can use for deciding a library is the ease of use. Why LOC is by no means a perfect metric to measure ease of use, it does reflect how much code one needs to type to get basic PLY I/O done. Also, note that these numbers report only simple versions of reading function without any error reporting, etc.
-
-One can argue that this is even less relevant in the age of AI agents, but I leve it here for reference.
-
-|  Library  |   Read LOC  | Write LOC |
-|:---------:|:-----------:|:---------:|
-| miniply   |    35       |  N/A      |
-| micro_ply |    25       |  N/A      |
-| msh_ply   |    29       |   23      |
-| nanoply   |    23       |   29      |
-| plylib    |    78       |   65      |
-| rply      |    69       |   23      |
-| happly    |  **17**     |   26      |
-| tinyply   |  **17**     | **10**    |
-| turkply   |    52       |   39      |
+**Note** The images show the read time on a log scale, since the performance of different libraries is significantly different.
 
 [Large Geometric Models Archvive]: https://www.cc.gatech.edu/projects/large_models/index.html
 [Stanford 3D Scaning Repository]: http://graphics.stanford.edu/data/3Dscanrep/
